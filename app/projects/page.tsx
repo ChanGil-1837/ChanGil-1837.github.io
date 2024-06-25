@@ -19,7 +19,7 @@ async function getProjects(): Promise<Project[]> {
       'Content-Type': 'application/json',
       'Notion-Version': '2022-06-28',
       'Accept': 'application/json',
-      'Authorization': `Bearer ${process.env.NEXT_PUBLIC_NOTION_TOKEN}`
+      'Authorization': `${process.env.NEXT_PUBLIC_NOTION_TOKEN}`
     },
     body: JSON.stringify({
       page_size: 100,
