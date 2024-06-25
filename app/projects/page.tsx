@@ -32,6 +32,10 @@ async function getProjects(): Promise<Project[]> {
     }),
   });
 
+  if (!res.ok) {
+    throw new Error('Failed to fetch projects');
+  }
+
   const data = await res.json();
   return data.results.map((ctx: any) => {
     const title = ctx.properties?.Name?.title?.[0]?.text?.content || 'No Title';
@@ -56,7 +60,26 @@ async function getProjects(): Promise<Project[]> {
 }
 
 export default async function Projects() {
-  const projects = await getProjects();
+  let projects: Project[] = [];
+
+  try {
+    projects = await getProjects();
+  } catch (error) {
+    console.error('Error fetching projects:', error);
+  }
+
+  if (!projects || projects.length === 0) {
+    return (
+      <section className="text-gray-600 body-font">
+        <div className="container px-5 py-24 mx-auto">
+          <div className="flex flex-col text-center w-full mb-20">
+            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">프로젝트</h1>
+            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">프로젝트를 가져오는 중 오류가 발생했습니다.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="text-gray-600 body-font">
@@ -65,6 +88,7 @@ export default async function Projects() {
           <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">프로젝트</h1>
           <p className="lg:w-2/3 mx-auto leading-relaxed text-base">여태 수행한 프로젝트 목록입니다. </p>
         </div>
+        ${process.env.NEXT_PUBLIC_NOTION_DATABASE}
         <div className="grid grid-cols-1 md:grid-cols-2 py-10 m-6 gap-8 sm:w-full">
           {projects.map((project: Project) => (
             <ProjectItem key={project.id} project={project} />
