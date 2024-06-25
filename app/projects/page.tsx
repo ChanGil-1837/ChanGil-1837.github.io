@@ -2,7 +2,7 @@ import RootLayout from "../layout";
 import ProjectItem from "./project-item";
 
 export default async function Projects() {
-    const projects = await POST();
+    const projects = await getData();
 
     return (
         
@@ -22,7 +22,7 @@ export default async function Projects() {
     );
 }
 
-export async function POST() {
+export async function getData() {
 
     const res = await fetch(process.env.NEXT_PUBLIC_NOTION_DATABASE, {
         cache: "no-store",
