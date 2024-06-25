@@ -67,7 +67,7 @@ export default async function Projects() {
   let projects: Project[] = [];
 
   try {
-    // projects = await getProjects();
+    projects = await getProjects();
   } catch (error) {
     console.error('Error fetching projects:', error);
   }
@@ -96,7 +96,6 @@ export default async function Projects() {
           {projects.map((project: Project) => (
             <ProjectItem key={project.id} project={project} />
           ))}
-          {process.env.NEXT_PUBLIC_NOTION_DATABASE}
         </div>
       </div>
     </section>
