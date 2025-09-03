@@ -23,6 +23,9 @@ export default function Header() {
                 <Link href = "/projects">
                     <p className="mr-5 hover:text-gray-900">프로젝트</p>
                 </Link>
+                <Link href = "/study">
+                    <p className="mr-5 hover:text-gray-900">이론 및 공부</p>
+                </Link>
                 </nav>
                 <DarkModeToggleButton/>
             </div>

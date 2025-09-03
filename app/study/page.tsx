@@ -66,7 +66,7 @@ async function getProjects(): Promise<Project[]> {
   });
 }
 
-export default async function Projects() {
+export default async function StudyPage() {
   let projects: Project[] = [];
 
   try {
@@ -75,15 +75,15 @@ export default async function Projects() {
     console.error('Error fetching projects:', error);
   }
 
-  const filteredProjects = projects.filter((p) => p.cat === 'project');
+  const filteredStudies = projects.filter((p) => p.cat === 'study');
 
-  if (!filteredProjects || filteredProjects.length === 0) {
+  if (!filteredStudies || filteredStudies.length === 0) {
     return (
       <section className="text-gray-600 body-font">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
-            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">프로젝트</h1>
-            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">프로젝트가 없거나 가져오는 중 오류가 발생했습니다.</p>
+            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">이론 및 공부</h1>
+            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">스터디 기록이 없거나 가져오는 중 오류가 발생했습니다.</p>
           </div>
         </div>
       </section>
@@ -94,11 +94,11 @@ export default async function Projects() {
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-24 mx-auto">
         <div className="flex flex-col text-center w-full mb-20">
-          <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">프로젝트</h1>
-          <p className="lg:w-2/3 mx-auto leading-relaxed text-base">여태 수행한 프로젝트 목록입니다. </p>
+          <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">이론 및 공부</h1>
+          <p className="lg:w-2/3 mx-auto leading-relaxed text-base">여태 공부한 내용 목록입니다. </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 py-10 m-6 gap-8 sm:w-full">
-          {filteredProjects.map((project: Project) => (
+          {filteredStudies.map((project: Project) => (
             <ProjectItem key={project.id} project={project} />
           ))}
         </div>
