@@ -31,12 +31,6 @@ async function getProjects(): Promise<Project[]> {
     },
     body: JSON.stringify({
       page_size: 100,
-      sorts: [
-        {
-          property: 'Work period',
-          direction: 'ascending'
-        }
-      ]
     }),
   });
 
@@ -85,7 +79,7 @@ export default async function StudyPage() {
     error = e;
   }
 
-  const filteredStudies = projects.filter((p) => p.cat === 'study');
+  const filteredStudies = projects.filter((p) => p.tags.some((tag) => tag.name === 'study'));
 
   if (error || !filteredStudies || filteredStudies.length === 0) {
     return (
