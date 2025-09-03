@@ -8,19 +8,26 @@ type Project = {
   start: string;
   end: string;
   link: string;
-  tags: { name: string }[]
+  tags: Array<{ name: string }>;
   cat: string;
 };
 
 async function getProjects(): Promise<Project[]> {
-  const res = await fetch(process.env.NEXT_PUBLIC_NOTION_DATABASE!, {
+  const notionToken = process.env.NEXT_PUBLIC_NOTION_TOKEN;
+  const notionDatabaseId = process.env.NEXT_PUBLIC_NOTION_DATABASE;
+
+  if (!notionToken || !notionDatabaseId) {
+    throw new Error('NEXT_PUBLIC_NOTION_TOKEN or NEXT_PUBLIC_NOTION_DATABASE is not set in environment variables.');
+  }
+
+  const res = await fetch(notionDatabaseId, {
     cache: 'no-store',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Notion-Version': '2022-06-28',
       'Accept': 'application/json',
-      'Authorization': `${process.env.NEXT_PUBLIC_NOTION_TOKEN}`
+      'Authorization': `${notionToken}`
     },
     body: JSON.stringify({
       page_size: 100,
@@ -38,6 +45,7 @@ async function getProjects(): Promise<Project[]> {
   }
 
   const data = await res.json();
+  console.log('Fetched data from Notion:', JSON.stringify(data, null, 2));
   if (!data.results) {
     throw new Error('No results found in the response');
   }
@@ -50,7 +58,7 @@ async function getProjects(): Promise<Project[]> {
     const end = ctx.properties?.['Work period']?.date?.end || 'No End Date';
     const link = ctx.properties?.link?.url || 'No Link';
     const tags = ctx.properties?.Tags?.multi_select?.map((tag: any) => ({ name: tag.name })) || [];
-    const cat = ctx.properties?.cat?.select?.name || 'project';
+    const cat = ctx.properties?.cat?.rich_text?.[0]?.text?.content || '';
 
     return {
       id: ctx.id,
@@ -68,22 +76,26 @@ async function getProjects(): Promise<Project[]> {
 
 export default async function StudyPage() {
   let projects: Project[] = [];
+  let error: any = null;
 
   try {
     projects = await getProjects();
-  } catch (error) {
-    console.error('Error fetching projects:', error);
+  } catch (e) {
+    console.error(e);
+    error = e;
   }
 
   const filteredStudies = projects.filter((p) => p.cat === 'study');
 
-  if (!filteredStudies || filteredStudies.length === 0) {
+  if (error || !filteredStudies || filteredStudies.length === 0) {
     return (
       <section className="text-gray-600 body-font">
         <div className="container px-5 py-24 mx-auto">
           <div className="flex flex-col text-center w-full mb-20">
             <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">이론 및 공부</h1>
-            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">스터디 기록이 없거나 가져오는 중 오류가 발생했습니다.</p>
+            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
+              {error ? error.message : '스터디 기록이 없거나 가져오는 중 오류가 발생했습니다.'}
+            </p>
           </div>
         </div>
       </section>
