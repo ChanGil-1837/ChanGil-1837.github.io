@@ -82,7 +82,9 @@ export default async function Projects() {
     error = e;
   }
 
-  if (error || !projects || projects.length === 0) {
+  const filteredProjects = projects.filter((p) => !p.tags.some((tag) => tag.name === 'study'));
+
+  if (error || !filteredProjects || filteredProjects.length === 0) {
     return (
       <section className="text-gray-600 body-font">
         <div className="container px-5 py-24 mx-auto">
@@ -105,7 +107,7 @@ export default async function Projects() {
           <p className="lg:w-2/3 mx-auto leading-relaxed text-base">여태 수행한 프로젝트 목록입니다. </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 py-10 m-6 gap-8 sm:w-full">
-          {projects.map((project: Project) => (
+          {filteredProjects.map((project: Project) => (
             <ProjectItem key={project.id} project={project} />
           ))}
         </div>
