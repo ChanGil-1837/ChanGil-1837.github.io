@@ -8,7 +8,7 @@ type Project = {
   start: string;
   end: string;
   link: string;
-  tags: Array<{ name: string }>;
+  tags: { name: string }[]
   cat: string;
 };
 
@@ -49,7 +49,7 @@ async function getProjects(): Promise<Project[]> {
     const start = ctx.properties?.['Work period']?.date?.start || 'No Start Date';
     const end = ctx.properties?.['Work period']?.date?.end || 'No End Date';
     const link = ctx.properties?.link?.url || 'No Link';
-    const tags = ctx.properties?.Tags?.multi_select.map((tag: any) => ({ name: tag.name })) || [];
+    const tags = ctx.properties?.Tags?.multi_select?.map((tag: any) => ({ name: tag.name })) || [];
     const cat = ctx.properties?.cat?.select?.name || 'project';
 
     return {
