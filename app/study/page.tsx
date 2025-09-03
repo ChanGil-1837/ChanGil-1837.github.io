@@ -9,7 +9,6 @@ type Project = {
   end: string;
   link: string;
   tags: Array<{ name: string }>;
-  cat: string;
 };
 
 async function getProjects(): Promise<Project[]> {
@@ -52,7 +51,6 @@ async function getProjects(): Promise<Project[]> {
     const end = ctx.properties?.['Work period']?.date?.end || 'No End Date';
     const link = ctx.properties?.link?.url || 'No Link';
     const tags = ctx.properties?.Tags?.multi_select?.map((tag: any) => ({ name: tag.name })) || [];
-    const cat = ctx.properties?.cat?.rich_text?.[0]?.text?.content || '';
 
     return {
       id: ctx.id,
@@ -63,7 +61,6 @@ async function getProjects(): Promise<Project[]> {
       end,
       link,
       tags,
-      cat
     };
   });
 }

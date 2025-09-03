@@ -9,7 +9,6 @@ type Project = {
   end: string;
   link: string;
   tags: Array<{ name: string }>;
-  cat: string;
 };
 
 async function getProjects(): Promise<Project[]> {
@@ -58,7 +57,6 @@ async function getProjects(): Promise<Project[]> {
     const end = ctx.properties?.['Work period']?.date?.end || 'No End Date';
     const link = ctx.properties?.link?.url || 'No Link';
     const tags = ctx.properties?.Tags?.multi_select?.map((tag: any) => ({ name: tag.name })) || [];
-    const cat = ctx.properties?.cat?.rich_text?.[0]?.text?.content || '';
 
     return {
       id: ctx.id,
@@ -69,7 +67,6 @@ async function getProjects(): Promise<Project[]> {
       end,
       link,
       tags,
-      cat
     };
   });
 }
@@ -85,9 +82,7 @@ export default async function Projects() {
     error = e;
   }
 
-  const filteredProjects = projects.filter((p) => p.cat === 'project');
-
-  if (error || !filteredProjects || filteredProjects.length === 0) {
+  if (error || !projects || projects.length === 0) {
     return (
       <section className="text-gray-600 body-font">
         <div className="container px-5 py-24 mx-auto">
@@ -110,7 +105,7 @@ export default async function Projects() {
           <p className="lg:w-2/3 mx-auto leading-relaxed text-base">여태 수행한 프로젝트 목록입니다. </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 py-10 m-6 gap-8 sm:w-full">
-          {filteredProjects.map((project: Project) => (
+          {projects.map((project: Project) => (
             <ProjectItem key={project.id} project={project} />
           ))}
         </div>
