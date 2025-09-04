@@ -14,7 +14,7 @@ type Project = {
 };
 
 export default function ProjectsClient({ projects }: { projects: Project[] }) {
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [selectedTags, setSelectedTags] = useState<string[]>(['project']);
 
   const allTags = Array.from(
     new Set(projects.flatMap((p) => p.tags.map((t) => t.name)))
@@ -29,20 +29,33 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
   const filteredProjects =
     selectedTags.length === 0
       ? projects
-      : projects.filter((p) => selectedTags.every((tag) => p.tags.map((t) => t.name).includes(tag)));
+      : projects.filter((p) => selectedTags.some((tag) => p.tags.map((t) => t.name).includes(tag)));
 
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-24 mx-auto">
         <div className="flex flex-col text-center w-full mb-20">
           <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">
-            게시판
+            블로그
           </h1>
         </div>
 
         {/* 태그 필터 버튼 */}
         <div className="flex justify-center flex-wrap mt-4 gap-2">
-          {allTags.map((tag) => (
+          {['project', 'study'].map((tag) => (
+            <button
+              key={tag}
+              onClick={() => toggleTag(tag)}
+              className={`px-4 py-2 rounded ${
+                selectedTags.includes(tag) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+              }`}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+        <div className="flex justify-center flex-wrap mt-2 gap-2">
+          {allTags.filter(t => !['project', 'study'].includes(t)).map((tag) => (
             <button
               key={tag}
               onClick={() => toggleTag(tag)}
@@ -56,7 +69,7 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
         </div>
 
         {/* 프로젝트 리스트 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 py-10 m-6 gap-8 sm:w-full">
+                <div className="masonry-container py-10 m-6 sm:w-full">
           {filteredProjects.map((project) => (
             <ProjectItem key={project.id} project={project} />
           ))}

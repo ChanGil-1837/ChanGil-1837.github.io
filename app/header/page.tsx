@@ -18,10 +18,10 @@ export default function Header() {
                 </Link>
                 <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center">
                 <Link href = "/">
-                    <p className="mr-5 hover:text-gray-900">홈</p>
+                    <p className="mr-5 hover:text-gray-900">프롤로그</p>
                 </Link>
                 <Link href = "/projects">
-                    <p className="mr-5 hover:text-gray-900">게시판</p>
+                    <p className="mr-5 hover:text-gray-900">블로그</p>
                 </Link>
                 </nav>
                 <DarkModeToggleButton/>

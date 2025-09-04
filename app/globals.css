@@ -33,3 +33,20 @@ p {
 
           hover:text-blue-600
 }
+
+.masonry-container {
+  column-count: 2;
+  column-gap: 1rem;
+}
+
+.masonry-container .project-card {
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .masonry-container {
+    column-count: 1;
+  }
+}

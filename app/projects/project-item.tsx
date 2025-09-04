@@ -35,35 +35,36 @@ export default function ProjectItem(data:any) {
     }
 
     return (
-    <div className="project-card">
-     <img
-        className="rounded-t-xl"
-        src={imgSrc}
-        alt='Cover Img'
-        style={{ width: '100%', height: '50%', objectFit: 'cover' }}
-      />
+        <a href={github} target="_blank" rel="noopener noreferrer">
+            <div className="project-card">
+            <img
+                className="rounded-t-xl"
+                src={imgSrc}
+                alt='Cover Img'
+                style={{ width: '100%', height: '50%', objectFit: 'cover' }}
+            />
 
-            <div className="p-4 flex flex-col">
-                <h1 className="text-2xl font-bold">{title}</h1>
-                <h3 className="mt-4 text-xl">{description}</h3>
-                <a href={github}>바로가기</a>
-                <p className="my-1 ">
-                    작업기간 : {start} ~ {end} ({calculatedPeriod(start, end)}일)
-                </p>
-                <div className="mt-2">
-                {chunkTags(tags, 5).map((chunk:any, index:number) => (
-                    <div key={index} className="flex items-start">
-                        {chunk.map((aTag:any) => (
-                            <h1 key={aTag.id} className="px-2 py-1 mr-2 rounded-md bg-sky-200 dark:bg-sky-700 w-30">
-                                {aTag.name}
-                            </h1>
+                    <div className="p-4 flex flex-col">
+                        <h1 className="text-2xl font-bold">{title}</h1>
+                        <h3 className="mt-4 text-xl">{description}</h3>
+                        <p className="my-1 ">
+                            작업기간 : {start} ~ {end} ({calculatedPeriod(start, end)}일)
+                        </p>
+                        <div className="mt-2">
+                        {chunkTags(tags, 5).map((chunk:any, index:number) => (
+                            <div key={index} className="flex items-start">
+                                {chunk.map((aTag:any) => (
+                                    <h1 key={aTag.id} className="px-2 py-1 mr-2 rounded-md bg-sky-200 dark:bg-sky-700 w-30">
+                                        {aTag.name}
+                                    </h1>
+                                ))}
+                            </div>
                         ))}
+                        </div>
+
                     </div>
-                ))}
+
                 </div>
-
-            </div>
-
-        </div>
+        </a>
     );
 }
