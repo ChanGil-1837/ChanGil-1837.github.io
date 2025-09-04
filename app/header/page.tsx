@@ -21,10 +21,7 @@ export default function Header() {
                     <p className="mr-5 hover:text-gray-900">홈</p>
                 </Link>
                 <Link href = "/projects">
-                    <p className="mr-5 hover:text-gray-900">프로젝트</p>
-                </Link>
-                <Link href = "/study">
-                    <p className="mr-5 hover:text-gray-900">이론 및 공부</p>
+                    <p className="mr-5 hover:text-gray-900">게시판</p>
                 </Link>
                 </nav>
                 <DarkModeToggleButton/>
