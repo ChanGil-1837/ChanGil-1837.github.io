@@ -17,10 +17,10 @@ export default function Header() {
                     </p>
                 </Link>
                 <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center">
-                <Link href = "/">
+                <Link href = "/about">
                     <p className="mr-5 hover:text-gray-900">프롤로그</p>
                 </Link>
-                <Link href = "/projects">
+                <Link href = "/">
                     <p className="mr-5 hover:text-gray-900">블로그</p>
                 </Link>
                 </nav>
