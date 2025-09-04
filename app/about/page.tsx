@@ -10,5 +10,10 @@ export default function About() {
           <h1 className="title-font sm:text-4xl text-3xl mb-4 font-medium text-gray-900">표시할게 없어서 임시로 <br></br>만들어둔 홈 화면</h1>
           <p className="mb-8 leading-relaxed">이렇게 해두면 꽤나 그럴듯 해보입니다. <br></br>나중에 더 정리가 되면 수정해야겠죠?</p>
         </div>
-    );
+        <div className="lg:max-w-lg lg:w-full md:w-1/2 w-5/6">
+          <Animation/>
+        </div>
+      </div>
+    </section>
+  );
 }
