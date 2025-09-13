@@ -32,8 +32,8 @@ async function getProjects(): Promise<Project[]> {
       page_size: 100,
       sorts: [
         {
-          property: 'Work period',
-          direction: 'ascending',
+          timestamp: 'created_time',
+          direction: 'descending',
         },
       ],
     }),
