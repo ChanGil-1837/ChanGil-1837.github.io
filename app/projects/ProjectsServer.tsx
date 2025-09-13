@@ -42,17 +42,21 @@ async function getProjects(): Promise<Project[]> {
   if (!res.ok) throw new Error('Failed to fetch projects');
 
   const data = await res.json();
+  
   if (!data.results) throw new Error('No results found in the response');
 
   return data.results.map((ctx: any) => {
     const title = ctx.properties?.Name?.title?.[0]?.text?.content || 'No Title';
-    const description = ctx.properties?.Description?.rich_text?.[0]?.text?.content || 'No Description';
+    const description = ctx.properties?.Description?.rich_text
+      ?.map((textBlock: any) => textBlock.text?.content || '')
+      .join('\n') || 'No Description';
+
     const cover = ctx.cover?.file?.url || '';
     const start = ctx.properties?.['Work period']?.date?.start || 'No Start Date';
     const end = ctx.properties?.['Work period']?.date?.end || 'No End Date';
     const link = ctx.properties?.link?.url || 'No Link';
     const tags = ctx.properties?.Tags?.multi_select?.map((tag: any) => ({ name: tag.name })) || [];
-
+    
     return { id: ctx.id, title, description, cover, start, end, link, tags };
   });
 }

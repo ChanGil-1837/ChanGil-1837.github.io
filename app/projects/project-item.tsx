@@ -1,3 +1,5 @@
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode, Key } from "react"
+
 export default function ProjectItem(data:any) {
 
     const title = data.project.title
@@ -46,7 +48,12 @@ export default function ProjectItem(data:any) {
 
                     <div className="p-4 flex flex-col">
                         <h1 className="text-2xl font-bold">{title}</h1>
-                        <h3 className="mt-4 text-xl">{description}</h3>
+                        <h6 className="mt-4 text-lg">
+                            {description.split('\n').map((line: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined, i: Key | null | undefined) => (
+                                <span key={i}>{line}<br /></span>
+                            ))}
+                            </h6>
+
                         <p className="my-1 ">
                             작업기간 : {start} ~ {end} ({calculatedPeriod(start, end)}일)
                         </p>
