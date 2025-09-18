@@ -1,6 +1,8 @@
+
 'use client';
 import { useState } from 'react';
 import ProjectItem from './project-item';
+import ProjectModal from './ProjectModal'; // Import the modal component
 
 type Project = {
   id: string;
@@ -11,10 +13,12 @@ type Project = {
   end: string;
   link: string;
   tags: Array<{ name: string }>;
+  content: string;
 };
 
 export default function ProjectsClient({ projects }: { projects: Project[] }) {
-    const [selectedTags, setSelectedTags] = useState<string[]>(['project']);
+  const [selectedTags, setSelectedTags] = useState<string[]>(['project']);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const allTags = Array.from(
     new Set(projects.flatMap((p) => p.tags.map((t) => t.name)))
@@ -24,6 +28,14 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
+  };
+
+  const handleProjectClick = (project: Project) => {
+    setSelectedProject(project);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProject(null);
   };
 
   const filteredProjects =
@@ -36,8 +48,11 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
       <div className="container px-5 py-24 mx-auto">
         <div className="flex flex-col text-center w-full mb-20">
           <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">
-            블로그
+            블로그 
           </h1>
+          <h2>
+            수리중...
+          </h2>
         </div>
 
         {/* 태그 필터 버튼 */}
@@ -69,12 +84,18 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
         </div>
 
         {/* 프로젝트 리스트 */}
-                <div className="masonry-container py-10 m-6 sm:w-full">
+        <div className="masonry-container py-10 m-6 sm:w-full">
           {filteredProjects.map((project) => (
-            <ProjectItem key={project.id} project={project} />
+            <ProjectItem key={project.id} project={project} onProjectClick={handleProjectClick} />
           ))}
         </div>
       </div>
+
+      {/* 모달 렌더링 */}
+      {selectedProject && (
+        <ProjectModal project={selectedProject} onClose={handleCloseModal} />
+      )}
     </section>
   );
 }
+

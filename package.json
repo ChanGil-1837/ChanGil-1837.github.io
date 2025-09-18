@@ -9,19 +9,28 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@next/mdx": "^15.5.3",
     "@notionhq/client": "^2.2.15",
     "dotenv": "^16.4.5",
+    "gray-matter": "^4.0.3",
     "localenv": "^0.2.2",
     "next": "^14.2.3",
+    "next-mdx-remote": "^5.0.0",
     "next-themes": "^0.3.0",
+    "re-resizable": "^6.11.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-lottie-player": "^2.0.0"
+    "react-lottie-player": "^2.0.0",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^15.6.6",
+    "remark-gfm": "^4.0.1",
+    "yet-another-react-lightbox": "^3.25.0"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",

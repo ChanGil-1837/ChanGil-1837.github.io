@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+.no-user-drag {
+  -webkit-user-drag: none;
+  -moz-user-drag: none;
+  -ms-user-drag: none;
+  user-drag: none;
+}
 
 .bg-primary {
   @apply bg-white dark:bg-slate-800

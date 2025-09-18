@@ -1,14 +1,22 @@
+
+
 import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode, Key } from "react"
 
-export default function ProjectItem(data:any) {
+type Project = {
+    id: string;
+    title: string;
+    description: string;
+    cover: string;
+    start: string;
+    end: string;
+    link: string;
+    tags: Array<{ name: string }>;
+    content: string;
+  };
 
-    const title = data.project.title
-    const description = data.project.description
-    const imgSrc =data.project.cover
-    const github = data.project.link
-    const tags = data.project.tags
-    const start = data.project.start
-    const end = data.project.end
+export default function ProjectItem({ project, onProjectClick }: { project: Project, onProjectClick: (project: Project) => void}) {
+
+    const { title, description, cover, start, end, tags } = project;
 
     const calculatedPeriod = (start:string, end:string) => {
         const startDateStringArray = start.split('-');
@@ -37,41 +45,37 @@ export default function ProjectItem(data:any) {
     }
 
     return (
-        <a href={github} target="_blank" rel="noopener noreferrer">
-            <div className="project-card">
+        <div className="project-card cursor-pointer" onClick={() => onProjectClick(project)}>
             <img
                 className="rounded-t-xl"
-                src={imgSrc}
+                src={cover}
                 alt='Cover Img'
                 style={{ width: '100%', height: '50%', objectFit: 'cover' }}
             />
 
-                    <div className="p-4 flex flex-col">
-                        <h1 className="text-2xl font-bold">{title}</h1>
-                        <h6 className="mt-4 text-lg">
-                            {description.split('\n').map((line: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined, i: Key | null | undefined) => (
-                                <span key={i}>{line}<br /></span>
-                            ))}
-                            </h6>
+            <div className="p-4 flex flex-col">
+                <h1 className="text-2xl font-bold">{title}</h1>
+                <h6 className="mt-4 text-lg">
+                    {description.split('\n').map((line: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined, i: Key | null | undefined) => (
+                        <span key={i}>{line}<br /></span>
+                    ))}
+                </h6>
 
-                        <p className="my-1 ">
-                            작업기간 : {start} ~ {end} ({calculatedPeriod(start, end)}일)
-                        </p>
-                        <div className="mt-2">
-                        {chunkTags(tags, 5).map((chunk:any, index:number) => (
-                            <div key={index} className="flex items-start">
-                                {chunk.map((aTag:any) => (
-                                    <h1 key={aTag.id} className="px-2 py-1 mr-2 rounded-md bg-sky-200 dark:bg-sky-700 w-30">
-                                        {aTag.name}
-                                    </h1>
-                                ))}
-                            </div>
+                <p className="my-1 ">
+                    작업기간 : {start} ~ {end} ({calculatedPeriod(start, end)}일)
+                </p>
+                <div className="mt-2">
+                {chunkTags(tags, 5).map((chunk:any, index:number) => (
+                    <div key={index} className="flex items-start">
+                        {chunk.map((aTag:any) => (
+                            <h1 key={aTag.id} className="px-2 py-1 mr-2 rounded-md bg-sky-200 dark:bg-sky-700 w-30">
+                                {aTag.name}
+                            </h1>
                         ))}
-                        </div>
-
                     </div>
-
+                ))}
                 </div>
-        </a>
+            </div>
+        </div>
     );
 }
