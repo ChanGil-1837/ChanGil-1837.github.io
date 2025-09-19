@@ -136,37 +136,37 @@ a: ({ children, href }: { children: React.ReactNode, href?: string }) => (
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 w-full h-full overflow-y-auto relative"
                onClick={(e) => e.stopPropagation()} draggable={false}>
 
-            <button onClick={handleClose}
-                    className="absolute top-4 right-4 text-2xl font-bold z-50 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200">&times;</button>
+            <div className="sticky -top-8 bg-white dark:bg-gray-800 p-8 pb-4 z-50 border-b border-gray-200 dark:border-gray-700">
 
-            {/* 동그라미 버튼 그룹 */}
-            <div className="absolute top-4 right-16 flex items-center z-50">
-              {widthOptions.map((option, idx) => (
-                <div key={option.key} className="relative">
-                  {selectedWidth === option.key && (
-                    <div className={`${option.sizeClass} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full -z-10`} />
-                  )}
-                  <button
-                    onClick={() => handleWidthChange(option.key)}
-                    className={`${option.sizeClass} bg-gray-400 text-white text-sm font-bold rounded-full border-2 border-white hover:bg-gray-500 transition-all duration-300 flex items-center justify-center`}
-                    style={{
-                      marginLeft: idx === 0 ? 0 : -8, // 버튼 겹치기
-                      transform: selectedWidth === option.key ? 'scale(1.1)' : 'scale(1)',
-                      transition: 'transform 0.3s ease-in-out',
-                    }}
-                  >
-                    {option.label}
-                  </button>
-                </div>
-              ))}
-            </div>
-
-
-            <article className="prose dark:prose-invert lg:prose-xl max-w-none">
+              <button onClick={handleClose}
+                      className="absolute top-4 right-4 text-2xl font-bold z-50 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200">&times;</button>
               <h1 className="text-3xl font-bold my-4">{project.title}</h1>
               <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline mb-4">
                 Visit Repository
               </a>
+              {/* 동그라미 버튼 그룹 */}
+              <div className="absolute top-4 right-16 flex items-center z-50">
+                {widthOptions.map((option, idx) => (
+                  <div key={option.key} className="relative">
+                    {selectedWidth === option.key && (
+                      <div className={`${option.sizeClass} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full -z-10`} />
+                    )}
+                    <button
+                      onClick={() => handleWidthChange(option.key)}
+                      className={`${option.sizeClass} bg-gray-400 text-white text-sm font-bold rounded-full border-2 border-white hover:bg-gray-500 transition-all duration-300 flex items-center justify-center`}
+                      style={{
+                        marginLeft: idx === 0 ? 0 : -8, // 버튼 겹치기
+                        transform: selectedWidth === option.key ? 'scale(1.1)' : 'scale(1)',
+                        transition: 'transform 0.3s ease-in-out',
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <article className="prose dark:prose-invert lg:prose-xl max-w-none pt-4">
               <MDXRemote {...project.content} components={components} />
             </article>
           </div>
