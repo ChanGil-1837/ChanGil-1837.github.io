@@ -46,6 +46,15 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [selectedWidth, setSelectedWidth] = useState<'0' | '50' | '80'>('50');
   const [showRelatedProjects, setShowRelatedProjects] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => setIsMobile(window.innerWidth < 768);
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
   useEffect(() => {
     const originalOverflow = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = 'hidden';
@@ -145,23 +154,23 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
       <>
         {/* Backdrop */}
         <div
-          className={`fixed inset-0 z-40 flex justify-center items-center transition-opacity duration-300 ease-in-out backdrop-blur-sm ${isShowing ? 'bg-black bg-opacity-50' : 'bg-transparent'}`}
+          className={`fixed inset-0 z-40 flex justify-center ${isMobile ? 'items-start' : 'items-center'} transition-opacity duration-300 ease-in-out backdrop-blur-sm ${isShowing ? 'bg-black bg-opacity-50' : 'bg-transparent'}`}
           onClick={() => !zoomedImage && handleClose()}
         >
           {/* Modal */}
           <Resizable
-            size={{ width: size.width, height: size.height }}
+            size={isMobile ? { width: '100%', height: '90vh' } : { width: size.width, height: size.height }}
             enable={{ left: false, right: false, top: false, bottom: false }}
             style={{ transition: 'width 0.4s ease' }}
             className={`relative transform transition-all duration-300 ease-in-out ${isShowing ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}
           >
             <div className="flex h-full">
               <div
-                className="bg-white dark:bg-gray-800 rounded-2xl p-8 w-full h-full overflow-y-auto relative"
+                className={`bg-white dark:bg-gray-800 ${isMobile ? 'rounded-b-2xl' : 'rounded-2xl'} ${isMobile ? 'p-4' : 'p-8'} w-full h-full overflow-y-auto relative`}
                 onClick={(e) => e.stopPropagation()} draggable={false}
               >
                 {/* Header */}
-                <div className="sticky -top-8 bg-white dark:bg-gray-800 p-8 pb-4 z-50 border-b border-gray-200 dark:border-gray-700">
+                <div className={`sticky -top-8 bg-white dark:bg-gray-800 ${isMobile ? 'p-4' : 'p-8'} pb-4 z-50 border-b border-gray-200 dark:border-gray-700`}>
                   <button
                     onClick={handleClose}
                     className="absolute top-4 right-4 text-2xl font-bold z-50 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors duration-200"
@@ -172,8 +181,7 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      console.log('Button clicked!', 'link:', project.link, 'isLinkValid:', isLinkValid);
-                      if (!isLinkValid) return; // 유효하지 않으면 바로 종료
+                      if (!isLinkValid) return;
                       window.open(project.link, '_blank');
                     }}
                     disabled={!isLinkValid}
@@ -187,7 +195,7 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
 
 
                   {/* Width buttons */}
-                  <div className="absolute top-4 right-16 flex items-center z-50">
+                  {!isMobile && <div className="absolute top-4 right-16 flex items-center z-50">
                     {widthOptions.map((option, idx) => (
                       <div key={option.key} className="relative">
                         {selectedWidth === option.key && (
@@ -206,7 +214,7 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
                         </button>
                       </div>
                     ))}
-                  </div>
+                  </div>}
                 </div>
 
                 {/* Content */}
