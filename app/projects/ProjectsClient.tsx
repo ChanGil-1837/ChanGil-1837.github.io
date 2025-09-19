@@ -63,9 +63,6 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
           <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">
             블로그 
           </h1>
-          <h2>
-            수리중...
-          </h2>
         </div>
 
         {/* 태그 필터 버튼 */}

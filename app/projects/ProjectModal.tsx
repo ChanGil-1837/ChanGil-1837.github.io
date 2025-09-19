@@ -154,19 +154,19 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
       <>
         {/* Backdrop */}
         <div
-          className={`fixed inset-0 z-40 flex justify-center ${isMobile ? 'items-start' : 'items-center'} transition-opacity duration-300 ease-in-out backdrop-blur-sm ${isShowing ? 'bg-black bg-opacity-50' : 'bg-transparent'}`}
+          className={`fixed inset-0 z-40 flex ${isMobile ? 'items-end' : 'justify-center items-center'} transition-opacity duration-300 ease-in-out backdrop-blur-sm ${isShowing ? 'bg-black bg-opacity-50' : 'bg-transparent'}`}
           onClick={() => !zoomedImage && handleClose()}
         >
           {/* Modal */}
           <Resizable
-            size={isMobile ? { width: '100%', height: '90vh' } : { width: size.width, height: size.height }}
+            size={isMobile ? { width: '100%', height: '95vh' } : { width: size.width, height: size.height }}
             enable={{ left: false, right: false, top: false, bottom: false }}
-            style={{ transition: 'width 0.4s ease' }}
+            style={{ transition: 'width 0.4s ease, height 0.4s ease' }}
             className={`relative transform transition-all duration-300 ease-in-out ${isShowing ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}
           >
             <div className="flex h-full">
               <div
-                className={`bg-white dark:bg-gray-800 ${isMobile ? 'rounded-b-2xl' : 'rounded-2xl'} ${isMobile ? 'p-4' : 'p-8'} w-full h-full overflow-y-auto relative`}
+                className={`bg-white dark:bg-gray-800 ${isMobile ? 'rounded-t-2xl' : 'rounded-2xl'} ${isMobile ? 'p-4' : 'p-8'} w-full h-full overflow-y-auto relative`}
                 onClick={(e) => e.stopPropagation()} draggable={false}
               >
                 {/* Header */}
@@ -218,7 +218,7 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
                 </div>
 
                 {/* Content */}
-                <article className="prose dark:prose-invert lg:prose-xl max-w-none pt-4">
+                <article className="prose dark:prose-invert lg:prose-xl max-w-none pt-4 break-words">
                   <MDXRemote {...project.content} components={{ ...components, OpenProjectLink }} />
                 </article>
               </div>
