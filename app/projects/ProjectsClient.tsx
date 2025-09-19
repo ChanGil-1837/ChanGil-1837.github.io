@@ -46,6 +46,15 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
       ? projects
       : projects.filter((p) => selectedTags.some((tag) => p.tags.map((t) => t.name).includes(tag)));
 
+  const handleOpenProjectBySlug = (slug: string | number) => {
+    const projectToOpen = projects.find(p => p.slug === slug);
+    if (projectToOpen) {
+      setSelectedProject(projectToOpen);
+    } else {
+      console.warn(`Project with slug '${slug}' not found.`);
+    }
+  };
+
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-24 mx-auto">

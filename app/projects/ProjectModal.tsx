@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MDXRemote } from 'next-mdx-remote'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
@@ -77,11 +77,19 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
       </div>
     ),
 
-    a: ({ children, href }: { children: React.ReactNode, href?: string }) => (
-      <a href={href} target="_blank" rel="noopener noreferrer"
-         onClick={(e) => e.stopPropagation()}
-         className="block text-center text-red-600 font-bold my-4 hover:underline">{children}</a>
-    ),
+a: ({ children, href }: { children: React.ReactNode, href?: string }) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    onClick={(e) => e.stopPropagation()}
+    className="block text-center font-bold my-4 hover:underline
+               text-red-600 dark:text-purple-400"
+  >
+    {children}
+  </a>
+),
+
     blockquote: ({ children }: { children: React.ReactNode }) => (
       <blockquote className="bg-gray-100 border-l-4 border-gray-400 p-4 my-4 rounded-md italic">{children}</blockquote>
     )
@@ -165,19 +173,20 @@ export default function ProjectModal({ project, onClose }: ProjectModalProps) {
         </Resizable>
       </div>
 
-{zoomedImage && (
-  <div
-    className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-70"
-    onClick={() => setZoomedImage(null)}
-  >
-    <img
-      src={zoomedImage}
-      alt="Zoomed"
-      className="max-w-[90vw] max-h-[95vh] object-contain"
-    />
-  </div>
-)}
-
+      {/* Zoomed Image Modal */}
+      {zoomedImage && (
+        <div
+          className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-70"
+          onClick={() => setZoomedImage(null)}
+        >
+          <img
+            src={zoomedImage}
+            alt="Zoomed"
+            className="max-w-[90vw] max-h-[95vh] object-contain"
+          />
+        </div>
+      )}
     </>
   );
 }
+
