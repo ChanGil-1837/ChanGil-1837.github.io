@@ -2,6 +2,8 @@
 import ProjectsClient from './ProjectsClient';
 import fs from 'fs';
 import path from 'path';
+
+import { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize'
 import remarkGfm from 'remark-gfm'
 
@@ -14,7 +16,9 @@ type Project = {
   end: string;
   link: string;
   tags: Array<{ name: string }>;
-  content: any; // Will hold the serialized MDX content
+  slug:string;
+  content: any;
+  imageSlides: { src: string }[];
 };
 
 const projectsDirectory = path.join(process.cwd(), '_projects');
@@ -83,8 +87,12 @@ async function getProjects(): Promise<Project[]> {
         },
         parseFrontmatter: true,
     });
+
+    const imageRegex = /!\[.*\]\\((.*?)\\)/g;
+    const matches = [...contentSource.matchAll(imageRegex)];
+    const imageSlides = matches.map(match => ({ src: match[1] }));
     
-    return { id: ctx.id, title, description, cover, start, end, link, tags, content: serializedContent };
+    return { id: ctx.id, title, description, cover, start, end, link, tags, slug, content: serializedContent, imageSlides };
   }));
 
   return projects;

@@ -1,9 +1,9 @@
-
-
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode, Key } from "react"
+import { MDXRemoteSerializeResult } from "next-mdx-remote";
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode, Key, useState, useEffect } from "react"
 
 type Project = {
     id: string;
+    slug: string | number; // Ensure slug is present
     title: string;
     description: string;
     cover: string;
@@ -11,12 +11,52 @@ type Project = {
     end: string;
     link: string;
     tags: Array<{ name: string }>;
-    content: string;
+    content: MDXRemoteSerializeResult; // Added back
+    imageSlides: { src: string }[];
   };
 
-export default function ProjectItem({ project, onProjectClick }: { project: Project, onProjectClick: (project: Project) => void}) {
+export default function ProjectItem({ project, onProjectClick }: { project: Project, onProjectClick: (project: Project) => void }) {
 
-    const { title, description, cover, start, end, tags } = project;
+    const { id, slug, title, description, cover, start, end, tags } = project; // Destructure slug
+    console.log(`[ProjectItem] Received Project ID: ${id}, Slug: ${slug}, Cover: ${cover}`);
+
+    const getLocalImagePaths = (projectSlug: string | number | null) => { // Changed parameter type
+        if (projectSlug === null) {
+            return []; // If slug is null, return empty array to force fallback to cover
+        }
+        const basePath = `/_projects/${projectSlug}/1`; // Use projectSlug for directory name
+        return [
+            `${basePath}.gif`,
+            `${basePath}.png`,
+            `${basePath}.jpg`,
+        ];
+    };
+
+    const localImagePaths = getLocalImagePaths(slug); // Use id here
+    const [currentImageSrc, setCurrentImageSrc] = useState<string>(localImagePaths[0] || cover); // Start with GIF, or original cover
+
+    useEffect(() => {
+        // Reset image source when project ID changes
+        setCurrentImageSrc(localImagePaths[0] || cover);
+    }, [id, cover]); // Also update dependency array
+
+
+    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+        const currentSrc = (e.target as HTMLImageElement).src;
+        console.log(`[ProjectItem] Image failed to load: ${currentSrc}`);
+        // Remove window.location.origin from currentSrc for comparison with localImagePaths
+        const pathWithoutOrigin = currentSrc.replace(window.location.origin, '');
+        const currentIndex = localImagePaths.indexOf(pathWithoutOrigin);
+
+        if (currentIndex !== -1 && currentIndex < localImagePaths.length - 1) {
+            const nextImagePath = localImagePaths[currentIndex + 1];
+            console.log(`[ProjectItem] Trying next image: ${nextImagePath}`);
+            setCurrentImageSrc(nextImagePath);
+        } else {
+            console.log(`[ProjectItem] No more local images. Falling back to original cover: ${cover}`);
+            setCurrentImageSrc(cover);
+        }
+    };
 
     const calculatedPeriod = (start:string, end:string) => {
         const startDateStringArray = start.split('-');
@@ -31,15 +71,15 @@ export default function ProjectItem({ project, onProjectClick }: { project: Proj
     };
 
     function chunkTags(tags :any, size:number) {
-        return tags.reduce((resultArray:any, item:any, index:number) => { 
+        return tags.reduce((resultArray:any, item:any, index:number) => {
             const chunkIndex = Math.floor(index / size);
-    
+
             if (!resultArray[chunkIndex]) {
                 resultArray[chunkIndex] = []; // 시작 지점
             }
-    
+
             resultArray[chunkIndex].push(item);
-    
+
             return resultArray;
         }, []);
     }
@@ -48,9 +88,10 @@ export default function ProjectItem({ project, onProjectClick }: { project: Proj
         <div className="project-card cursor-pointer" onClick={() => onProjectClick(project)}>
             <img
                 className="rounded-t-xl"
-                src={cover}
+                src={currentImageSrc} // Use the state variable
                 alt='Cover Img'
                 style={{ width: '100%', height: '50%', objectFit: 'cover' }}
+                onError={handleImageError} // Add error handler
             />
 
             <div className="p-4 flex flex-col">

@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import ProjectItem from './project-item';
 import ProjectModal from './ProjectModal'; // Import the modal component
+import { MDXRemoteSerializeResult } from 'next-mdx-remote';
 
 type Project = {
   id: string;
+  slug: string | number; // Ensure slug is present
   title: string;
   description: string;
   cover: string;
@@ -13,7 +15,8 @@ type Project = {
   end: string;
   link: string;
   tags: Array<{ name: string }>;
-  content: string;
+  content: any;
+  imageSlides: { src: string }[];
 };
 
 export default function ProjectsClient({ projects }: { projects: Project[] }) {
