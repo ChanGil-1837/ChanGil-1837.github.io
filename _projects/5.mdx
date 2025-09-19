@@ -1,0 +1,215 @@
+## 시작하며 & 디자인
+
+![Image 1](/_projects/5/2.gif)
+
+낭낭하게 다이얼로그 에디터를 제작하고 나서 이제 게임만 만들면 되겠다 생각했었습니다.  
+<br/>
+그러나 그것은 오만이었습니다.
+처음엔 몇 줄 안 되는 대사로 시작했는데,  
+스토리가 커지고 캐릭터가 늘어나면서 대사량이 눈덩이처럼 불어나더라고요. 
+<br/>
+엑셀, 텍스트 파일... 온갖 방법으로 관리해 봐도 결국은 혼란스러운 <b>'대사 지옥'</b>에 빠지기 일쑤였죠.  
+매번 이런 고민에 빠져 스프레드시트와 씨름하는 시간이 늘어갈수록,  
+창작의 즐거움은 점점 사라지는 기분이었어요. 개발 속도도 늦어지고 말이죠.
+<br/>
+이대로는 안 되겠다 싶었어요. 
+복잡한 파일 구조와 수동 관리에 질려버린 저는,  
+<br/>
+><b>"이 고질병을 해결할 나만의 도구를 만들어보자!"</b>
+
+라는 생각에 불이 붙었습니다.  
+<br/>
+복잡한 JSON 파일을 뒤지거나 언어별 폴더를 찾아 헤매지 않고,  
+오직 스토리에만 몰입할 수 있는 환경. 그게 제가 간절히 원했던 거예요.
+
+<br/>
+---
+<br/>
+
+## 🛠️ 기능 & 개발
+
+제가 만들고 싶었던 건 명확했어요.
+<br/>
+<b>한눈에 보이는 직관적인 캘린더</b>: 모든 대사와 이벤트를 시간 흐름에 따라 달력에 시각화해서 한 번에 파악하고 싶었어요  
+<b>클릭 몇 번으로 끝내는 편집</b>: 번거로운 파일 수정 없이 클릭 몇 번으로 대사와 이벤트를 수정, 관리  
+<b>스토리에만 집중</b>: 모든 번거로움에서 벗어나 스토리와 콘텐츠 개발에만 온전히 몰입
+<br/>
+결론적으로 <b>"툴이 창작의 걸림돌이 되어서는 안 된다"</b>는 철학으로 개발을 시작했습니다.  
+개발자의 시간을 아껴 창의적 에너지를 스토리텔링에 쏟도록 돕는 것이 이 프로젝트의 가장 큰 목표였죠.
+
+<br/>
+
+<br/>
+---
+<br/>
+
+# 기술 선택
+
+예전에 <b>WPF(Windows Presentation Foundation)</b>를 다뤄본 경험이 떠올랐어요.  <br/>
+UI 프레임워크 선택에 큰 도움이 되었죠. WPF의 <b>데이터 바인딩</b>과 <b>MVVM 패턴</b>은 UI 로직을 깔끔하게 분리해서 관리할 수 있게 해줍니다.
+<br/>
+MVVM은 View, ViewModel, Model을 철저히 나누는 패턴이에요.  
+<b>View</b>는 화면 표시와 사용자 입력 처리만 담당하고, <b>ViewModel</b>은 UI 관련 로직과 상태 관리, 이벤트 처리를 맡습니다. <b>Model</b>은 데이터와 핵심 비즈니스 로직을 책임지죠.  
+<br/>
+즉, <b>뷰와 뷰모델은 분리되어야 한다</b>는 것이 WPF의 철학입니다. 덕분에 테스트하기도 쉽고 유지보수도 편하지만, 파일 수가 3배로 늘어나고 구조가 복잡해지는 단점이 있습니다.  
+<br/>
+어쩌겠어요. 프레임워크가 그렇게 설계된 거니까요 ㅠㅠ  
+작은 프로젝트라면 과감히 ViewModel과 Model을 통합해도 되지만, WPF에서 MVVM의 장점을 최대한 살리려면 분리는 필수입니다.  
+<br/>
+이번 프로젝트에서는 <b>Avalonia UI</b>를 선택해서 WPF와 비슷한 MVVM 스타일로 UI를 구성했습니다.
+<br/>
+덕분에 익숙한 패턴으로 안정적인 에디터 환경을 만들 수 있었고, 덕분에 1주일도 안되는 기간동안 프로그램을 완성할 수 있었습니다.
+
+<br/>
+---
+<br/>
+
+## 그럼 개발을 시작해봅시다.
+
+우선 요구사항부터 생각해봐요.
+
+| id  | month | day | date     | time       | location | conditions | dialogue     |
+|-----|-------|-----|----------|------------|----------|------------|-------------|
+| 9   | 2     | 20  | Saturday | morning    | room     |            | Feb/20/01   |
+| 10  | 2     | 20  | Saturday | afternoon  | room     |            | Feb/20/02   |
+
+<br/>
+
+제 게임의 다이얼로그 이벤트 조건은 다음의 조건을 필요로 합니다.
+<br/>
+<b>1. 날짜</b><br/>
+<b>1. 시간대</b><br/>
+<b>1. 특정 조건</b><br/>
+<br/>
+그런 만큼, 다이얼로그를 한눈에 보고 관리하기위해서 현재는
+<br/>
+<b>1. 다이얼로그를 작성한다.</b><br/>
+<b>2. 해당 이벤트를 eventlist.csv 에 기입한다</b><br/>
+<b>3. 같은 파일 경로에 영어 대사도 준비한다.</b><br/>
+<b>4. 대사 및 이벤트에 대해서 수정을 하기위해서는 직접 폴더 구성 및 이름을 하나하나 변경해야한다.</b><br/>
+<br/>
+위의 작업을 한 프로그램에서 알아서 해준다면 을마나 좋겠어요~ <br/>
+그래서 만들어 봤습니다.
+<br/>
+---
+<br/>
+
+## 화면 표시
+![Image 1](/_projects/5/3.gif)
+
+우선 화면에 데이터를 뿌려주기 위해서 eventlist.csv 가 있는 폴더를 선택하고,
+해당 폴더에 eventlist.csv 가 있으면 
+
+폴더를 로드 하고, 다이얼로그의 존재 유무와 관계 없이 eventlist 에 쓰여진대로
+달력에 데이터를 뿌려줍니다.
+
+만약 2월 21일에 추가된 이벤트가 있으면 캘린더에 버튼 들을 해당 날짜의 scroll view 에 넣어주는거죠.
+
+<br/>
+![Image 1](/_projects/5/4.png)
+
+이벤트 편집 기능<br/>
+
+Open KR / EN: 다이얼로그 에디터 프로그램에서 지정된 경로의 데이터를 불러옵니다.<br/>
+데이터가 없는 경우: 새 파일을 생성하여 빈 다이얼로그 데이터를 만들어줍니다.<br/>
+Save: 다이얼로그 이벤트 정보가 갱신되면 저장하고, 화면을 갱신합니다.<br/>
+<br/>
+이처럼 큰 흐름에서, 화면 표시와 이벤트 편집 기능은 위와 같이 동작하는데
+<br/>
+이정도만 되어도 이벤트를 관리하는데 있어서 큰 문제는 없어보입니다.
+
+
+<br/>
+---
+<br/>
+
+## 번외기능
+![Image 1](/_projects/5/1.gif)
+
+캘린더에 맞게 되어있지만, 캘린더의 시작 요일은 따로 지정해줘야합니다.
+자동으로 만들라고했더니만, 이것이 올해 2월의 날짜를 가져왔더라고요...
+```xml
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+            <TextBlock Text="시작 요일:" VerticalAlignment="Center" Foreground="White" Margin="0,0,5,0"/>
+            <ComboBox ItemsSource="{Binding WeekDays}"
+                      SelectedItem="{Binding SelectedStartDay, Mode=TwoWay}"
+                      Width="120"/>
+        </StackPanel>
+```
+```cs
+        public DayOfWeek SelectedStartDay
+        {
+            get => _selectedStartDay;
+            set
+            {
+                if (SetProperty(ref _selectedStartDay, value))
+                    RefreshCurrentMonth();
+            }
+        }
+```
+```cs
+        public void SetMonth(string monthName, string csvPath, DayOfWeek? firstDayOverride = null)
+        {
+            CurrentMonth = monthName;
+            _csvPath = csvPath;
+            if (!File.Exists(_csvPath)) return;
+
+            var events = ParseCsv(_csvPath);
+            DayOfWeek firstDay = firstDayOverride ?? (_monthStartDays.ContainsKey(monthName)
+                                                    ? (DayOfWeek)_monthStartDays[monthName]
+                                                    : DayOfWeek.Sunday);
+
+            if (_selectedStartDay != firstDay)
+            {
+                _selectedStartDay = firstDay;
+                OnPropertyChanged(nameof(SelectedStartDay));
+            }
+
+            if (!DateTime.TryParseExact(monthName, "MMM", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt)) return;
+            int monthNumber = dt.Month;
+
+            GenerateMonthDays(monthNumber, events, firstDay);
+
+            _monthStartDays[monthName] = (int)firstDay;
+            CalendarSettings.Instance.Save();
+        }
+
+        private void RefreshCurrentMonth()
+        {
+            if (!string.IsNullOrEmpty(_currentMonth) && !string.IsNullOrEmpty(AppSettings.CSVPATH))
+                SetMonth(_currentMonth, AppSettings.CSVPATH, SelectedStartDay);
+        }
+```
+그래서 날짜를 선택하게 하는 기능을 만들었고, 해당 데이터도 저장헤야하니 
+옵션도 json을 통해 저장하고 불러오는 기능을 추가했습니다.
+<br/><br/>
+### 그 외 필요기능
+
+현재 없는 다이얼로그를 열때 새로운 다이얼로그를 해당 경로에 저장해주는 기능이 있습니다만,
+다이얼로그의 이름도 정해줄수 있으면 좋겠어서
+
+>이름을 입력하세요
+
+와 같은 기능도 필요할 것 같습니다.
+
+차차 추가하면 될 것 같네요.
+
+<br/>
+---
+<br/>
+
+
+## 리포지토리는 여기에!
+
+다이얼로그 에디터 부터 시작한다면  
+이 프로젝트는 오랜 고민과 노력이 담긴 결과물이에요.  
+거짐 2년 쯤 되었군요.  
+혹시 저처럼 대사 관리 때문에 골머리를 앓고 계신 게임 개발자분들이 계신다면  
+작은 도움이 되었으면 좋겠어요.
+<br/>
+해당 저장소에는 SampleData 및 Sample 용 다이얼로그 에디터도 들어있습니다.
+<br/>
+[**Dialogue Calendar App GitHub Repository**](https://github.com/ChanGil-1837/Avalonia_DialogueCalendarApp)
+
+코드 피드백, 기능 제안, 버그 리포트 언제든 환영입니다!  
+함께 더 좋은 툴을 만들어가면 정말 즐거울 것 같아요. 💚
