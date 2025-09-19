@@ -1,0 +1,64 @@
+# 0으로 나누기
+
+수학 시간에 선생님께서 항상 강조하시던 규칙이 있습니다. 바로 어떤 숫자도 0으로 나눌 수 없다는 것이죠. 1 나누기 0, 10 나누기 0, 100 나누기 0... 이 모든 계산은 정의되지 않습니다.<br/>
+
+그렇다면 컴퓨터에게 이 계산을 시키면 어떻게 될까요? 컴퓨터는 수학의 기본 규칙을 그대로 따를까요?  
+한번 알아보기로 합시다.<br/>
+
+<br/>
+
+## 수학에서 '0으로 나누기'가 불가능한 이유
+
+컴퓨터가 어떤 계산을 하는지 이해하기 전에, 먼저 수학에서 0으로 나누는 것이 왜 불가능한지 다시 한번 짚고 넘어가는 것이 좋겠습니다.<br/>
+
+나눗셈은 곱셈의 역연산입니다. 예를 들어, 6 나누기 3은 2입니다. 이것은 3×2=6 이기 때문이죠.  
+그럼 6÷0 을 계산해 봅시다. 0×?=6 이 되는 숫자를 찾아야 하는데, 어떤 숫자를 0에 곱해도 결과는 항상 0입니다. 따라서 6을 만들 수 있는 수는 세상에 존재하지 않습니다.<br/>
+
+만약 0÷0 을 계산한다면 어떨까요? 0×?=0 이 되는 숫자를 찾아야 합니다. 그런데 어떤 숫자를 0에 곱해도 0이 되므로, 답은 1도 될 수 있고, 2도 될 수 있고, 100도 될 수 있습니다.  
+답이 하나로 정해지지 않기 때문에 이 역시 수학에서는 정의하지 않습니다.<br/>
+
+<br/>
+
+## 그래도 시켜본다면?
+
+<b>정수형 0 나눗셈</b>을 시도하면 대부분의 언어에서 에러가 발생합니다.  
+C#에서는 <b>DivideByZeroException</b> 같은 런타임 에러가 납니다.<br/>
+
+```csharp
+int a = 10;
+int b = 0;
+Console.WriteLine(a / b); // DivideByZeroException 발생
+```
+```pgsql
+chanhogil@chanhos-MacBook-Pro ConsoleApp1 % dotnet run
+Unhandled exception. System.DivideByZeroException: Attempted to divide by zero.
+at HelloWorld.Program.Main(String[] args) in
+```
+
+<b>실수형</b>에서는 조금 다르게 동작합니다.<br/>
+1.0을 0.0으로 나누면 <b>Infinity</b>로 처리됩니다.
+```csharp
+float a = 1.0f;
+float b = 0;
+Console.WriteLine(a / b);
+```
+```pgsql
+chanhogil@chanhos-MacBook-Pro ConsoleApp1 % dotnet run
+∞
+```
+0.0을 0.0으로 나누면 <b>NaN (Not a Number)</b>로 처리됩니다.
+```pgsql
+chanhogil@chanhos-MacBook-Pro ConsoleApp1 % dotnet run
+NaN
+```
+
+정수형에는 무한대나 NaN 개념이 없으므로 무조건 예외가 발생합니다.<br/>
+<br/>
+결과
+정수형 0 나눗셈은 C#에서 <b>DivideByZeroException</b>이 발생하며, 프로그램이 멈춥니다.<br/>
+실수형에서는 <b>Infinity</b>나 <b>NaN</b>으로 처리될 수 있지만, 정수형에는 그런 개념이 없어서 에러가 납니다.<br/>
+<br/>
+결론
+>수학적으로 불가능한 연산이기 때문에, 정수형 0 나눗셈은 항상 예외 발생<br/>
+>실수형은 <b>Infinity</b>나 <b>NaN</b>으로 처리 가능<br/>
+>소수점 계산 시에는 가능하면 정수로 바꿔서 계산하는 것이 안전하다<br/>

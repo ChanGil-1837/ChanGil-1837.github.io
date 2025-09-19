@@ -1,0 +1,125 @@
+![Image 1](/_projects/3/3.gif)
+
+게임을 만들다 보면, 조건 검사·대화 실행·중간 이벤트 처리 같은 요소들이 서로 얽히면서 코드가 복잡해지기 쉽습니다  
+<br/>
+
+특히 대사량이 많은 스토리 중심 게임이라면,  
+“이벤트 조건을 어떻게 관리할 것인가”와  
+“대화 중 발생하는 다양한 이벤트를 어떻게 처리할 것인가”가  
+<b>핵심 과제</b>입니다  
+<br/>
+
+저는 이 문제를 해결하기 위해,  
+<b>거시적 이벤트</b>와 <b>미시적 이벤트</b>를 분리하는 구조를 채택했습니다.  
+그리고 대화는 <b>전용 외부 에디터</b>에서 작성해,  
+게임과 시나리오 작업을 분리할 수 있도록 만들었습니다  
+<br/>
+
+위의 아키텍쳐 다이어그램 같은 방식으로 제작하였고  
+상세 내용은 다음과 같습니다  
+
+<br/>
+---
+<br/>
+
+## 1. 씬 시작과 이벤트 체크
+![Image 2](/_projects/3/2.png)
+씬(<b>BaseScene</b>)이 시작되면,  
+<b>GameLoopManager</b>가 자동으로 깨어납니다.  
+이 매니저는 두 가지를 동시에 확인합니다:  
+
+- GameManager에서 현재 플레이어 데이터를 조회 → 지금 상태는 어떤가?  
+- EventChecker를 통해 eventlist.csv를 확인 → 지금 조건에 맞는 이벤트가 있는가?  
+
+조건이 일치하면, 곧바로 해당 이벤트와 연결된 대화 파일을 불러옵니다  
+
+<br/>
+---
+<br/>
+
+## 2. 대화 시스템의 흐름
+
+이벤트가 선택되면,  
+<b>DialogueLoader</b>가 json 파일을 읽어들입니다.  
+가공된 데이터는 <b>DialogueReader</b>로 전달되고,  
+다시 <b>Dictionary&lt;int, DialogueNodeData&gt;</b> 타입으로 파싱됩니다  
+
+<br/>
+```csharp
+using System.Collections.Generic;
+
+namespace Dialogue
+{
+    public enum DialogueType
+    {
+        none, normal, choice, condition,
+    }
+
+    public class DialogueNodeData
+    {
+        public DialogueType dialogueType = DialogueType.none;
+        public string id = "";
+        public string content;
+        public Choice[] choices;
+        public int name;
+        public List<DialogueEvent> eventList = new List<DialogueEvent>();
+        public string dir_name;
+    }
+
+    public class Choice
+    {
+        public string text;
+        public string nextNodeID;
+        public int index;
+    }
+
+    public class DialogueEvent
+    {
+        public string eventType;
+        public string options;
+    }
+}
+```
+<br/>
+그 후에 실제 게임 화면에는 대사가 순서대로 출력됩니다.
+여기서 중요한 점은 대화 중간에도 이벤트가 발생할 수 있다는 것입니다<br/>
+플레이어의 선택지나 스크립트 태그가 조건을 만족하면,
+<b>DialogueReader</b>가 <b>EventManager</b>에게 신호를 보냅니다
+<br/> 
+--- 
+<br/>
+## 3. 대화 중 이벤트 처리
+<b>EventManager</b>는 받은 신호를 해석하여 게임 속 다양한 시스템을 제어합니다<br/>
+예를 들어:
+><b>GameManager의 데이터를 갱신한다</b><br/>
+><b>SceneLoader 등 다른 시스템에 명령을 내려 즉시 연출을 바꾼다</b><br/>
+
+
+이렇게 하면 대화와 게임플레이가 분리되지 않고 유기적으로 연결됩니다
+<br/> 
+--- 
+<br/>
+## 4. 외부 대화 에디터의 역할
+대사는 json, 이벤트 목록은 csv 파일로 관리합니다.<br/>
+
+직접 만든 전용 다이얼로그 에디터에서 기획자와 시나리오 담당자가 바로 편집할 수 있도록 했습니다
+<br/>
+><b>장점 1: 비개발자도 쉽게 수정 가능</b><br/>
+><b>장점 2: 버전 관리(Git 등)와 협업에 용이</b><br/>
+><b>장점 3: 게임 엔진 코드와 시나리오 작업을 명확히 분리</b><br/>
+<br/>
+즉, 게임 개발자는 시스템만 유지하고,<br/> 
+스토리 작성자는 툴에서 바로 콘텐츠를 넣을 수 있습니다
+<br/> 
+--- 
+<br/>
+## 5. 정리
+정리하자면,<br/> 
+<b>GameLoopManager</b> → 씬 시작과 시간 경과에 따른 거시적 이벤트 담당<br/> 
+<b>EventManager</b> → 대화 도중 발생하는 미시적 이벤트 담당<br/> 
+<b>EventManager</b> 대사 데이터 → 외부 에디터에서 관리, CSV로 가져오기<br/> 
+<br/> 
+이 구조 덕분에 스토리가 커져도 시스템이 무너지지 않고,
+새로운 이벤트나 연출도 유연하게 확장할 수 있습니다
+![Image 3](/_projects/3/4.png)
+![Image 3](/_projects/3/1.gif)
