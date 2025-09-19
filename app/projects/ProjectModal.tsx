@@ -44,18 +44,19 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
   const [isShowing, setIsShowing] = useState(false);
   const [size, setSize] = useState({ width: DEFAULT_WIDTH, height: '90vh' });
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
-  const [selectedWidth, setSelectedWidth] = useState<'0' | '50' | '80'>('0');
+  const [selectedWidth, setSelectedWidth] = useState<'0' | '50' | '80'>('50');
   const [showRelatedProjects, setShowRelatedProjects] = useState(false);
-
   useEffect(() => {
     const savedWidth = localStorage.getItem('projectModalWidth');
     if (savedWidth) {
       const savedWidthNum = Number(savedWidth);
       setSize(prev => ({ ...prev, width: savedWidthNum }));
-
+    
       if (savedWidthNum === DEFAULT_WIDTH) setSelectedWidth('0');
       else if (savedWidthNum === window.innerWidth * 0.5) setSelectedWidth('50');
       else setSelectedWidth('80');
+    } else {
+      setSize(prev => ({ ...prev, width: window.innerWidth * 0.5 }));
     }
     setIsShowing(true);
   }, []);
@@ -129,6 +130,8 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
     { key: '50', label: '50%', sizeClass: 'w-12 h-12' },
     { key: '80', label: '80%', sizeClass: 'w-16 h-16' }
   ];
+  const isLinkValid = project.link && project.link !== "No Link" && project.link.trim() !== '';
+
 
   return (
     <ProjectModalContext.Provider value={{ onOpenProjectBySlug }}>
@@ -159,9 +162,22 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
                     &times;
                   </button>
                   <h1 className="text-3xl font-bold my-4">{project.title}</h1>
-                  <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline mb-4">
-                    Visit Repository
-                  </a>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      console.log('Button clicked!', 'link:', project.link, 'isLinkValid:', isLinkValid);
+                      if (!isLinkValid) return; // 유효하지 않으면 바로 종료
+                      window.open(project.link, '_blank');
+                    }}
+                    disabled={!isLinkValid}
+                    className={`mt-4 px-4 py-2 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-all duration-200 ease-in-out
+                              ${isLinkValid
+                                ? 'bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800'
+                                : 'bg-gray-400 text-gray-200 cursor-not-allowed'}`}
+                  >
+                    View Repository
+                  </button>
+
 
                   {/* Width buttons */}
                   <div className="absolute top-4 right-16 flex items-center z-50">
