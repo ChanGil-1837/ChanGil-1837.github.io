@@ -45,7 +45,7 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
   const [size, setSize] = useState({ width: DEFAULT_WIDTH, height: '90vh' });
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [selectedWidth, setSelectedWidth] = useState<'0' | '50' | '80'>('50');
-  const [showRelatedProjects, setShowRelatedProjects] = useState(false);
+  const [showRelatedProjects, setShowRelatedProjects] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -142,9 +142,9 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
   };
 
   const widthOptions: { key: '0' | '50' | '80', label: string, sizeClass: string }[] = [
-    { key: '0', label: '0', sizeClass: 'w-10 h-10' },
+    { key: '0', label: '0', sizeClass: 'w-12 h-12' },
     { key: '50', label: '50%', sizeClass: 'w-12 h-12' },
-    { key: '80', label: '80%', sizeClass: 'w-16 h-16' }
+    { key: '80', label: '80%', sizeClass: 'w-12 h-12' }
   ];
   const isLinkValid = project.link && project.link !== "No Link" && project.link.trim() !== '';
 
@@ -185,11 +185,12 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
                       window.open(project.link, '_blank');
                     }}
                     disabled={!isLinkValid}
-                    className={`mt-4 px-4 py-2 rounded-full shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-all duration-200 ease-in-out
+                    className={`mt-4 inline-flex items-center px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-all duration-200 ease-in-out
                               ${isLinkValid
                                 ? 'bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800'
                                 : 'bg-gray-400 text-gray-200 cursor-not-allowed'}`}
                   >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                     View Repository
                   </button>
 
@@ -199,21 +200,28 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
                     {widthOptions.map((option, idx) => (
                       <div key={option.key} className="relative">
                         {selectedWidth === option.key && (
-                          <div className={`${option.sizeClass} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full -z-10`} />
+                          <div
+                            className={`${option.sizeClass} absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full -z-10`}
+                          />
                         )}
                         <button
                           onClick={() => handleWidthChange(option.key)}
-                          className={`${option.sizeClass} bg-gray-400 text-white text-sm font-bold rounded-full border-2 border-white hover:bg-gray-500 transition-all duration-300 flex items-center justify-center`}
+                          className={`${option.sizeClass} ${
+                            selectedWidth === option.key
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-400 text-white"
+                          } text-sm font-bold rounded-full border-2 border-white hover:bg-gray-500 transition-all duration-300 flex items-center justify-center`}
                           style={{
                             marginLeft: idx === 0 ? 0 : -8,
-                            transform: selectedWidth === option.key ? 'scale(1.1)' : 'scale(1)',
-                            transition: 'transform 0.3s ease-in-out',
+                            transform: selectedWidth === option.key ? "scale(1.2)" : "scale(0.8)",
+                            transition: "transform 0.3s ease-in-out",
                           }}
                         >
                           {option.label}
                         </button>
                       </div>
                     ))}
+
                   </div>}
                 </div>
 
@@ -229,7 +237,8 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
         {/* Related List */}
         {project.relative && project.relative.length > 0 && (
           <div
-            className="fixed top-1/2 -translate-y-1/2 w-64 rounded-l-2xl p-4 overflow-y-auto z-50 shadow-lg transform transition-transform duration-300 ease-in-out"
+            className="fixed top-1/2 -translate-y-1/2 w-64 rounded-l-2xl p-4 overflow-y-auto z-50 shadow-lg transform transition-transform duration-300 ease-in-out 
+                      bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm"
             style={{ right: showRelatedProjects ? '0' : '-256px' }}
           >
             <button
