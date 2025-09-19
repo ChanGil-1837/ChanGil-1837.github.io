@@ -17,6 +17,7 @@ type Project = {
   tags: Array<{ name: string }>;
   content: any;
   imageSlides: { src: string }[];
+  relative: string[];
 };
 
 export default function ProjectsClient({ projects }: { projects: Project[] }) {
@@ -105,7 +106,7 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
 
       {/* 모달 렌더링 */}
       {selectedProject && (
-        <ProjectModal project={selectedProject} onClose={handleCloseModal} />
+        <ProjectModal key={selectedProject.id} project={selectedProject} onClose={handleCloseModal} onOpenProjectBySlug={handleOpenProjectBySlug} allProjects={projects} />
       )}
     </section>
   );

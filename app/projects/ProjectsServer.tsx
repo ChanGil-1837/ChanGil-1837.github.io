@@ -19,6 +19,7 @@ type Project = {
   slug:string;
   content: any;
   imageSlides: { src: string }[];
+  relative: string[];
 };
 
 const projectsDirectory = path.join(process.cwd(), '_projects');
@@ -68,6 +69,7 @@ async function getProjects(): Promise<Project[]> {
     const link = ctx.properties?.link?.url || 'No Link';
     const tags = ctx.properties?.Tags?.multi_select?.map((tag: any) => ({ name: tag.name })) || [];
     const slug = ctx.properties?.slug?.rich_text?.[0]?.text?.content || null;
+    const relative = ctx.properties?.relative?.rich_text?.[0]?.text?.content?.split(',').map((s: string) => s.trim()) || [];
 
     let contentSource = description; // Default to description
     if (slug) {
@@ -92,7 +94,7 @@ async function getProjects(): Promise<Project[]> {
     const matches = [...contentSource.matchAll(imageRegex)];
     const imageSlides = matches.map(match => ({ src: match[1] }));
     
-    return { id: ctx.id, title, description, cover, start, end, link, tags, slug, content: serializedContent, imageSlides };
+    return { id: ctx.id, title, description, cover, start, end, link, tags, slug, content: serializedContent, imageSlides, relative };
   }));
 
   return projects;

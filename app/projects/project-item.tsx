@@ -13,6 +13,7 @@ type Project = {
     tags: Array<{ name: string }>;
     content: MDXRemoteSerializeResult; // Added back
     imageSlides: { src: string }[];
+    relative: string[];
   };
 
 export default function ProjectItem({ project, onProjectClick }: { project: Project, onProjectClick: (project: Project) => void }) {
