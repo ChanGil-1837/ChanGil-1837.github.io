@@ -47,6 +47,9 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
   const [selectedWidth, setSelectedWidth] = useState<'0' | '50' | '80'>('50');
   const [showRelatedProjects, setShowRelatedProjects] = useState(false);
   useEffect(() => {
+    const originalOverflow = window.getComputedStyle(document.body).overflow;
+    document.body.style.overflow = 'hidden';
+
     const savedWidth = localStorage.getItem('projectModalWidth');
     if (savedWidth) {
       const savedWidthNum = Number(savedWidth);
@@ -59,6 +62,10 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
       setSize(prev => ({ ...prev, width: window.innerWidth * 0.5 }));
     }
     setIsShowing(true);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
   }, []);
 
   const components = {
