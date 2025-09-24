@@ -59,7 +59,6 @@ async function getProjects(locale: string): Promise<Project[]> {
     const isJP = locale.toUpperCase() === 'JP';
     
     const title = (isJP ? ctx.properties?.JPName?.rich_text?.[0]?.text?.content : ctx.properties?.Name?.title?.[0]?.text?.content) || 'No Title';
-    console.log(ctx)
     const description = (isJP ? ctx.properties?.JPDesc?.rich_text : ctx.properties?.Description?.rich_text)
       ?.map((textBlock: any) => textBlock.text?.content || '')
       .join('\n') || 'No Description';
