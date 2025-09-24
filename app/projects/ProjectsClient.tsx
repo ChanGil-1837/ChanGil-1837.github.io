@@ -79,9 +79,7 @@ export default function ProjectsClient() {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  
 
   return (
     <section className="text-gray-600 body-font">

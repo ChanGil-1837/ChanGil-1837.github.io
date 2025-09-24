@@ -1,9 +1,10 @@
 import { MDXRemoteSerializeResult } from "next-mdx-remote";
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode, Key, useState, useEffect } from "react"
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode, Key } from "react";
+import Image from 'next/image';
 
 type Project = {
     id: string;
-    slug: string | number; // Ensure slug is present
+    slug: string | number;
     title: string;
     description: string;
     cover: string;
@@ -11,49 +12,14 @@ type Project = {
     end: string;
     link: string;
     tags: Array<{ name: string }>;
-    content: MDXRemoteSerializeResult; // Added back
+    content: MDXRemoteSerializeResult;
     imageSlides: { src: string }[];
     relative: string[];
   };
 
 export default function ProjectItem({ project, onProjectClick }: { project: Project, onProjectClick: (project: Project) => void }) {
 
-    const { id, slug, title, description, cover, start, end, tags } = project; // Destructure slug
-
-    const getLocalImagePaths = (projectSlug: string | number | null) => { // Changed parameter type
-        if (projectSlug === null) {
-            return []; // If slug is null, return empty array to force fallback to cover
-        }
-        const basePath = `/_projects/${projectSlug}/1`; // Use projectSlug for directory name
-        return [
-            `${basePath}.gif`,
-            `${basePath}.png`,
-            `${basePath}.jpg`,
-        ];
-    };
-
-    const localImagePaths = getLocalImagePaths(slug); // Use id here
-    const [currentImageSrc, setCurrentImageSrc] = useState<string>(localImagePaths[0] || cover); // Start with GIF, or original cover
-
-    useEffect(() => {
-        // Reset image source when project ID changes
-        setCurrentImageSrc(localImagePaths[0] || cover);
-    }, [id, cover]); // Also update dependency array
-
-
-    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-        const currentSrc = (e.target as HTMLImageElement).src;
-        // Remove window.location.origin from currentSrc for comparison with localImagePaths
-        const pathWithoutOrigin = currentSrc.replace(window.location.origin, '');
-        const currentIndex = localImagePaths.indexOf(pathWithoutOrigin);
-
-        if (currentIndex !== -1 && currentIndex < localImagePaths.length - 1) {
-            const nextImagePath = localImagePaths[currentIndex + 1];
-            setCurrentImageSrc(nextImagePath);
-        } else {
-            setCurrentImageSrc(cover);
-        }
-    };
+    const { title, description, cover, start, end, tags } = project;
 
     const calculatedPeriod = (start:string, end:string) => {
         const startDateStringArray = start.split('-');
@@ -83,18 +49,19 @@ export default function ProjectItem({ project, onProjectClick }: { project: Proj
 
     return (
         <div className="project-card cursor-pointer" onClick={() => onProjectClick(project)}>
-            <img
-                className="rounded-t-xl"
-                src={currentImageSrc} // Use the state variable
+            <Image
+                className="rounded-t-xl w-full h-auto"
+                src={cover}
                 alt='Cover Img'
-                style={{ width: '100%', height: '50%', objectFit: 'cover' }}
-                onError={handleImageError} // Add error handler
+                width={500}
+                height={300}
+                style={{ objectFit: 'cover' }}
             />
 
             <div className="p-4 flex flex-col">
                 <h1 className="text-2xl font-bold">{title}</h1>
                 <h6 className="mt-4 text-lg">
-                    {description.split('\n').map((line: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined, i: Key | null | undefined) => (
+                    {description.split('\n').map((line: string, i: number) => (
                         <span key={i}>{line}<br /></span>
                     ))}
                 </h6>

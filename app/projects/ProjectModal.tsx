@@ -295,11 +295,15 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
             className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-70"
             onClick={() => setZoomedImage(null)}
           >
-            <img
-              src={zoomedImage}
-              alt="Zoomed"
-              className="max-w-[90vw] max-h-[95vh] object-contain"
-            />
+            <div className="relative w-[90vw] h-[95vh]">
+              <Image
+                src={zoomedImage}
+                alt="Zoomed"
+                fill
+                style={{ objectFit: 'contain' }}
+                sizes="90vw"
+              />
+            </div>
           </div>
         )}
       </>
