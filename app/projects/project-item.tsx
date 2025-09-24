@@ -19,7 +19,6 @@ type Project = {
 export default function ProjectItem({ project, onProjectClick }: { project: Project, onProjectClick: (project: Project) => void }) {
 
     const { id, slug, title, description, cover, start, end, tags } = project; // Destructure slug
-    console.log(`[ProjectItem] Received Project ID: ${id}, Slug: ${slug}, Cover: ${cover}`);
 
     const getLocalImagePaths = (projectSlug: string | number | null) => { // Changed parameter type
         if (projectSlug === null) {
@@ -44,17 +43,14 @@ export default function ProjectItem({ project, onProjectClick }: { project: Proj
 
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
         const currentSrc = (e.target as HTMLImageElement).src;
-        console.log(`[ProjectItem] Image failed to load: ${currentSrc}`);
         // Remove window.location.origin from currentSrc for comparison with localImagePaths
         const pathWithoutOrigin = currentSrc.replace(window.location.origin, '');
         const currentIndex = localImagePaths.indexOf(pathWithoutOrigin);
 
         if (currentIndex !== -1 && currentIndex < localImagePaths.length - 1) {
             const nextImagePath = localImagePaths[currentIndex + 1];
-            console.log(`[ProjectItem] Trying next image: ${nextImagePath}`);
             setCurrentImageSrc(nextImagePath);
         } else {
-            console.log(`[ProjectItem] No more local images. Falling back to original cover: ${cover}`);
             setCurrentImageSrc(cover);
         }
     };

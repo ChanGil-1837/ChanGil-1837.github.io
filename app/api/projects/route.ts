@@ -46,7 +46,7 @@ async function getProjects(locale: string): Promise<Project[]> {
         },
       ],
     }),
-    next: { revalidate: 3600 },
+    next: { revalidate: 600 },
   });
 
   if (!res.ok) throw new Error('Failed to fetch projects from Notion');
@@ -57,7 +57,9 @@ async function getProjects(locale: string): Promise<Project[]> {
 
   const projects = await Promise.all(data.results.map(async (ctx: any) => {
     const isJP = locale.toUpperCase() === 'JP';
-    const title = (isJP ? ctx.properties?.JPName?.title?.[0]?.text?.content : ctx.properties?.Name?.title?.[0]?.text?.content) || 'No Title';
+    
+    const title = (isJP ? ctx.properties?.JPName?.rich_text?.[0]?.text?.content : ctx.properties?.Name?.title?.[0]?.text?.content) || 'No Title';
+    console.log(ctx)
     const description = (isJP ? ctx.properties?.JPDesc?.rich_text : ctx.properties?.Description?.rich_text)
       ?.map((textBlock: any) => textBlock.text?.content || '')
       .join('\n') || 'No Description';
