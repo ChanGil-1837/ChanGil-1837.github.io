@@ -1,0 +1,215 @@
+## 始めに＆デザイン
+
+![Image 1](/_projects/5/2.gif)
+
+ダイアログエディタを意気揚々と制作し、これでゲームを作るだけだと思っていました。  
+<br/>
+しかし、それは傲慢でした。
+最初は数行のセリフから始まりましたが、  
+ストーリーが大きくなり、キャラクターが増えるにつれて、セリフの量が雪だるま式に増えていきました。 
+<br/>
+Excel、テキストファイル…あらゆる方法で管理してみても、結局は混乱した **「セリフ地獄」** に陥るのが常でした。  
+毎回このような悩みに陥り、スプレッドシートと格闘する時間が増えるほど、  
+創作の楽しさは次第に消えていく気分でした。開発速度も遅くなってしまいます。
+<br/>
+このままではいけないと思いました。 
+複雑なファイル構造と手動管理にうんざりした私は、  
+<br/>
+> **「この持病を解決する自分だけのツールを作ってみよう！」**
+
+という思いに火がつきました。  
+<br/>
+複雑なJSONファイルを調べたり、言語別のフォルダを探し回ったりすることなく、  
+ひたすらストーリーにだけ没頭できる環境。それが私が切に望んでいたものでした。
+
+<br/>
+---
+<br/>
+
+## 🛠️ 機能＆開発
+
+私が作りたかったものは明確でした。
+<br/>
+**一目でわかる直感的なカレンダー**: すべてのセリフとイベントを時間の流れに沿ってカレンダーに視覚化し、一度に把握したかったのです。  
+**数回のクリックで終わる編集**: 面倒なファイル修正なしに、数回のクリックでセリフとイベントを修正、管理。  
+**ストーリーにだけ集中**: すべての煩わしさから解放され、ストーリーとコンテンツ開発にだけ完全に没頭。
+<br/>
+結論として、**「ツールが創作の障害になってはならない」** という哲学で開発を始めました。  
+開発者の時間を節約し、創造的なエネルギーをストーリーテリングに注げるように手助けすることが、このプロジェクトの最大の目標でした。
+
+<br/>
+
+<br/>
+---
+<br/>
+
+# 技術選択
+
+以前に **WPF(Windows Presentation Foundation)** を扱った経験が思い浮かびました。  <br/>
+UIフレームワークの選択に大いに役立ちました。WPFの **データバインディング** と **MVVMパターン** は、UIロジックをきれいに分離して管理できるようにしてくれます。
+<br/>
+MVVMはView、ViewModel、Modelを徹底的に分けるパターンです。  
+**View** は画面表示とユーザー入力処理のみを担当し、**ViewModel** はUI関連のロジックと状態管理、イベント処理を担当します。**Model** はデータと核心的なビジネスロジックを担います。  
+<br/>
+つまり、**ビューとビューモデルは分離されるべきだ** というのがWPFの哲学です。おかげでテストもしやすく、メンテナンスも楽ですが、ファイル数が3倍に増え、構造が複雑になるという欠点があります。  
+<br/>
+仕方ありません。フレームワークがそのように設計されているのですから。  
+小さなプロジェクトなら思い切ってViewModelとModelを統合してもいいですが、WPFでMVVMの長所を最大限に活かすには、分離は必須です。  
+<br/>
+今回のプロジェクトでは、**Avalonia UI** を選択し、WPFと似たMVVMスタイルでUIを構成しました。
+<br/>
+おかげで、慣れ親しんだパターンで安定したエディタ環境を作ることができ、1週間もかからずにプログラムを完成させることができました。
+
+<br/>
+---
+<br/>
+
+## それでは開発を始めましょう。
+
+まず、要件から考えてみましょう。
+
+| id  | month | day | date     | time       | location | conditions | dialogue     |
+|-----|-------|-----|----------|------------|----------|------------|-------------|
+| 9   | 2     | 20  | Saturday | morning    | room     |            | Feb/20/01   |
+| 10  | 2     | 20  | Saturday | afternoon  | room     |            | Feb/20/02   |
+
+<br/>
+
+私のゲームのダイアログイベント条件は、次の条件を必要とします。
+<br/>
+**1. 日付**<br/>
+**2. 時間帯**<br/>
+**3. 特定の条件**<br/>
+<br/>
+そのため、ダイアログを一目で見て管理するために、現在は
+<br/>
+**1. ダイアログを作成する。**<br/>
+**2. 該当イベントをeventlist.csvに記入する。**<br/>
+**3. 同じファイルパスに英語のセリフも用意する。**<br/>
+**4. セリフやイベントを修正するためには、直接フォルダ構成や名前を一つ一つ変更しなければならない。**<br/>
+<br/>
+上記の作業を一つのプログラムで自動的にやってくれたら、どんなにいいでしょう。 <br/>
+そこで作ってみました。
+<br/>
+---
+<br/>
+
+## 画面表示
+![Image 1](/_projects/5/3.gif)
+
+まず、画面にデータを表示するために、eventlist.csvがあるフォルダを選択し、
+そのフォルダにeventlist.csvがあれば 
+
+フォルダをロードし、ダイアログの存在有無に関係なく、eventlistに書かれている通りに
+カレンダーにデータを表示します。
+
+もし2月21日に追加されたイベントがあれば、カレンダーのボタンを該当日付のscroll viewに入れます。
+
+<br/>
+![Image 1](/_projects/5/4.png)
+
+**イベント編集機能**<br/>
+
+**Open KR / EN**: ダイアログエディタプログラムで指定されたパスのデータを読み込みます。<br/>
+**データがない場合**: 新しいファイルを生成し、空のダイアログデータを作成します。<br/>
+**Save**: ダイアログイベント情報が更新されたら保存し、画面を更新します。<br/>
+<br/>
+このように大きな流れで、画面表示とイベント編集機能は上記のように動作しますが、
+<br/>
+これだけでもイベントを管理する上で大きな問題はなさそうです。
+
+
+<br/>
+---
+<br/>
+
+## その他の機能
+![Image 1](/_projects/5/1.gif)
+
+カレンダーに合わせて作られていますが、カレンダーの開始曜日は別途指定してあげる必要があります。
+自動で作るように言ったら、今年の2月の日付を持ってきたんですよ…
+```xml
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+            <TextBlock Text="開始曜日:" VerticalAlignment="Center" Foreground="White" Margin="0,0,5,0"/>
+            <ComboBox ItemsSource="{Binding WeekDays}"
+                      SelectedItem="{Binding SelectedStartDay, Mode=TwoWay}"
+                      Width="120"/>
+        </StackPanel>
+```
+```cs
+        public DayOfWeek SelectedStartDay
+        {
+            get => _selectedStartDay;
+            set
+            {
+                if (SetProperty(ref _selectedStartDay, value))
+                    RefreshCurrentMonth();
+            }
+        }
+```
+```cs
+        public void SetMonth(string monthName, string csvPath, DayOfWeek? firstDayOverride = null)
+        {
+            CurrentMonth = monthName;
+            _csvPath = csvPath;
+            if (!File.Exists(_csvPath)) return;
+
+            var events = ParseCsv(_csvPath);
+            DayOfWeek firstDay = firstDayOverride ?? (_monthStartDays.ContainsKey(monthName)
+                                                    ? (DayOfWeek)_monthStartDays[monthName]
+                                                    : DayOfWeek.Sunday);
+
+            if (_selectedStartDay != firstDay)
+            {
+                _selectedStartDay = firstDay;
+                OnPropertyChanged(nameof(SelectedStartDay));
+            }
+
+            if (!DateTime.TryParseExact(monthName, "MMM", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt)) return;
+            int monthNumber = dt.Month;
+
+            GenerateMonthDays(monthNumber, events, firstDay);
+
+            _monthStartDays[monthName] = (int)firstDay;
+            CalendarSettings.Instance.Save();
+        }
+
+        private void RefreshCurrentMonth()
+        {
+            if (!string.IsNullOrEmpty(_currentMonth) && !string.IsNullOrEmpty(AppSettings.CSVPATH))
+                SetMonth(_currentMonth, AppSettings.CSVPATH, SelectedStartDay);
+        }
+```
+そこで、日付を選択できるようにする機能を作り、そのデータも保存しなければならないので
+オプションもjsonを通じて保存・読み込みする機能を追加しました。
+<br/><br/>
+### その他必要な機能
+
+現在ないダイアログを開くときに、新しいダイアログをそのパスに保存する機能がありますが、
+ダイアログの名前も決められたらいいなと思って
+
+>名前を入力してください
+
+のような機能も必要になりそうです。
+
+順次追加していけばよさそうですね。
+
+<br/>
+---
+<br/>
+
+
+## リポジトリはこちらに！
+
+ダイアログエディタから始めるとしたら  
+このプロジェクトは長年の悩みと努力が込められた結果物です。  
+ほぼ2年くらいになりましたね。  
+もし私のようにセリフ管理で頭を悩ませているゲーム開発者の方がいらっしゃれば  
+少しでも助けになれば嬉しいです。
+<br/>
+このリポジトリにはSampleDataおよびSample用のダイアログエディタも入っています。
+<br/>
+[**Dialogue Calendar App GitHub Repository**](https://github.com/ChanGil-1837/Avalonia_DialogueCalendarApp)
+
+コードのフィードバック、機能提案、バグレポートはいつでも歓迎です！  
+一緒にもっと良いツールを作っていけたら本当に嬉しいです。 💚

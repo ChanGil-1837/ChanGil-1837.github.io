@@ -1,8 +1,9 @@
-"use client"
+'use client'
 
 
 import Link from "next/link";
 import DarkModeToggleButton from "../components/dark-mode-toggle-button";
+import LocaleButtons from "../components/LocaleButtons";
 
 export default function Header() {
     return (
@@ -18,12 +19,13 @@ export default function Header() {
                 </Link>
                 <nav className="md:ml-auto flex flex-wrap items-center text-base justify-center">
                 <Link href = "/about">
-                    <p className="mr-5 hover:text-gray-900">프롤로그</p>
+                    <p className="mr-5 hover:text-gray-900">Prologue</p>
                 </Link>
                 <Link href = "/">
-                    <p className="mr-5 hover:text-gray-900">블로그</p>
+                    <p className="mr-5 hover:text-gray-900">Blog</p>
                 </Link>
                 </nav>
+                <LocaleButtons />
                 <DarkModeToggleButton/>
             </div>
         </header>

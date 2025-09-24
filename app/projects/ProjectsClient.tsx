@@ -1,13 +1,13 @@
-
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProjectItem from './project-item';
-import ProjectModal from './ProjectModal'; // Import the modal component
+import ProjectModal from './ProjectModal';
+import { useLocale } from '../contexts/LocaleContext';
 import { MDXRemoteSerializeResult } from 'next-mdx-remote';
 
 type Project = {
   id: string;
-  slug: string | number; // Ensure slug is present
+  slug: string | number;
   title: string;
   description: string;
   cover: string;
@@ -20,9 +20,32 @@ type Project = {
   relative: string[];
 };
 
-export default function ProjectsClient({ projects }: { projects: Project[] }) {
+export default function ProjectsClient() {
+  const { locale } = useLocale();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedTags, setSelectedTags] = useState<string[]>(['project']);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/projects?locale=${locale}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch projects');
+        }
+        const data = await response.json();
+        setProjects(data.projects);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, [locale]);
 
   const allTags = Array.from(
     new Set(projects.flatMap((p) => p.tags.map((t) => t.name)))
@@ -55,6 +78,10 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
       console.warn(`Project with slug '${slug}' not found.`);
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <section className="text-gray-600 body-font">
@@ -108,4 +135,3 @@ export default function ProjectsClient({ projects }: { projects: Project[] }) {
     </section>
   );
 }
-

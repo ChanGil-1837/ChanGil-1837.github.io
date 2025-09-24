@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./header/page";
 import Footer from "./footer/page";
 import Providers from "./components/provider";
+import { LocaleProvider } from "./contexts/LocaleContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +22,13 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning lang="en">
       <body className="bg-primary">
-        <Providers>
-        <Header></Header>
-          {children}
-        <Footer></Footer>
-        </Providers>
+        <LocaleProvider>
+          <Providers>
+          <Header></Header>
+            {children}
+          <Footer></Footer>
+          </Providers>
+        </LocaleProvider>
         </body>
     </html>
   );

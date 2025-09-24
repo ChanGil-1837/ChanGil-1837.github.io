@@ -1,0 +1,125 @@
+![Image 1](/_projects/3/3.gif)
+
+ゲームを作っていると、条件チェック、会話の実行、中間イベントの処理といった要素が互いに絡み合い、コードが複雑になりがちです。  
+<br/>
+
+特にセリフ量の多いストーリー中心のゲームであれば、  
+「イベント条件をどう管理するか」と  
+「会話中に発生する様々なイベントをどう処理するか」が  
+<b>核心的な課題</b>となります。  
+<br/>
+
+私はこの問題を解決するために、  
+<b>マクロイベント</b>と<b>ミクロイベント</b>を分離する構造を採用しました。  
+そして、会話は<b>専用の外部エディタ</b>で作成し、  
+ゲームとシナリオ作業を分離できるようにしました。  
+<br/>
+
+上記のアーキテクチャ図のような方式で制作し、  
+詳細は以下の通りです。  
+
+<br/>
+---
+<br/>
+
+## 1. シーン開始とイベントチェック
+![Image 2](/_projects/3/2.png)
+シーン（<b>BaseScene</b>）が始まると、  
+<b>GameLoopManager</b>が自動的に起動します。  
+このマネージャーは2つのことを同時に確認します：  
+
+- GameManagerで現在のプレイヤーデータを照会 → 今の状態はどうか？  
+- EventCheckerを通じてeventlist.csvを確認 → 今の条件に合うイベントはあるか？  
+
+条件が一致すれば、直ちにそのイベントに連携された会話ファイルを読み込みます。  
+
+<br/>
+---
+<br/>
+
+## 2. 対話システムのフロー
+
+イベントが選択されると、  
+<b>DialogueLoader</b>がjsonファイルを読み込みます。  
+加工されたデータは<b>DialogueReader</b>に渡され、  
+再び<b>Dictionary&lt;int, DialogueNodeData&gt;</b> 型にパースされます。  
+
+<br/>
+```csharp
+using System.Collections.Generic;
+
+namespace Dialogue
+{
+    public enum DialogueType
+    {
+        none, normal, choice, condition,
+    }
+
+    public class DialogueNodeData
+    {
+        public DialogueType dialogueType = DialogueType.none;
+        public string id = "";
+        public string content;
+        public Choice[] choices;
+        public int name;
+        public List<DialogueEvent> eventList = new List<DialogueEvent>();
+        public string dir_name;
+    }
+
+    public class Choice
+    {
+        public string text;
+        public string nextNodeID;
+        public int index;
+    }
+
+    public class DialogueEvent
+    {
+        public string eventType;
+        public string options;
+    }
+}
+```
+<br/>
+その後、実際のゲーム画面にはセリフが順番に出力されます。
+ここで重要なのは、会話の途中でもイベントが発生しうるということです。<br/>
+プレイヤーの選択肢やスクリプトタグが条件を満たすと、
+<b>DialogueReader</b>が<b>EventManager</b>に信号を送ります。
+<br/> 
+--- 
+<br/>
+## 3. 会話中のイベント処理
+<b>EventManager</b>は受け取った信号を解釈し、ゲーム内の様々なシステムを制御します。<br/>
+例えば：
+><b>GameManagerのデータを更新する</b><br/>
+><b>SceneLoaderなど他のシステムに命令を出し、即座に演出を変える</b><br/>
+
+
+これにより、会話とゲームプレイが分離されず、有機的に連携します。
+<br/> 
+--- 
+<br/>
+## 4. 外部対話エディタの役割
+セリフはjson、イベントリストはcsvファイルで管理します。<br/>
+
+自作の専用ダイアログエディタで、企画者やシナリオ担当者が直接編集できるようにしました。
+<br/>
+><b>利点1：非開発者でも簡単に修正可能</b><br/>
+><b>利点2：バージョン管理（Gitなど）と共同作業に容易</b><br/>
+><b>利点3：ゲームエンジンのコードとシナリオ作業を明確に分離</b><br/>
+<br/>
+つまり、ゲーム開発者はシステムだけを維持し、
+ストーリー作成者はツールで直接コンテンツを投入できます。
+<br/> 
+--- 
+<br/>
+## 5. まとめ
+まとめると、<br/> 
+<b>GameLoopManager</b> → シーン開始と時間経過に伴うマクロイベントを担当<br/> 
+<b>EventManager</b> → 会話中に発生するミクロイベントを担当<br/> 
+<b>セリフデータ</b> → 外部エディタで管理し、CSVでインポート<br/> 
+<br/> 
+この構造のおかげで、ストーリーが大きくなってもシステムが崩壊せず、
+新しいイベントや演出も柔軟に拡張できます。
+![Image 3](/_projects/3/4.png)
+![Image 3](/_projects/3/1.gif)

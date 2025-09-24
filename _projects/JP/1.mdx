@@ -1,0 +1,131 @@
+# Unity Enviro 3 + Depth of Field 問題の解決
+![Image 1](/_projects/1/1.gif)
+## 問題の状況
+![Image 2](/_projects/1/5.png)
+
+最近、Unity Asset Storeで **Enviro 3 Sky and Weather**（空/天気システム）を購入しました。
+ところが、Depth of Field（Bokeh）のポストプロセスを適用してみると、遠景（スカイボックスと雲）までぼやけてしまいました。
+つまり、建物のような3Dオブジェクトは問題ありませんが、私がお金を出して買った素敵な空がポストプロセスの効果でぼやけてしまったのです。
+![Image 2](/_projects/1/4.png)
+開発者に問い合わせてみましたが、やったことがないとのこと…
+しかし、このまま諦めるわけにはいかないので、方法を考えてみることにします。
+<br/>
+---
+<br/>
+
+## なぜこのような問題が発生するのか？
+
+ポストプロセス（Post-Process）は、レンダリングが終わった画面の **ピクセル全体** にフィルターを適用する方式です。
+
+しかし、被写界深度（DoF, Depth of Field）は単純な色補正フィルターではありません。
+
+ピクセルごとに **デプスバッファ（Depth Buffer）** を参照して、どれだけブラー（blur）を適用するかを計算します。
+
+つまり、レンダーターゲットに描かれたすべてのピクセル（オブジェクト + 空）がDoFの計算対象になります。
+
+問題は、空にもボケが適用されるという点です。
+
+デプスバッファは、カメラの近くを `0.0`、遠くを `1.0` で表現します。
+
+空は事実上 **無限遠景** に位置するため、デプス値は1.0に近いです。
+
+したがって、Bokeh DoFの計算過程で空の領域を別途例外処理しないと、空も一般のオブジェクトのようにブラーが適用される問題が発生します。
+<br/>
+---
+<br/>
+
+## 解決方法
+
+解決策は簡単です。
+
+**DepthTextureでスカイボックス領域を検出し、CoC（Circle of Confusion）を0に固定してブラーを除外**すればいいのです。
+<br/>
+---
+<br/>
+### オリジナルコード (URP Bokeh Shader, `FragCoC`)
+
+```hlsl
+half FragCoC(Varyings input) : SV_Target
+{
+    UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
+    float2 uv = UnityStereoTransformScreenSpaceTex(input.texcoord);
+    float depth = LOAD_TEXTURE2D_X(_CameraDepthTexture, _SourceSize.xy * uv).x;
+    float linearEyeDepth = LinearEyeDepth(depth, _ZBufferParams);
+
+    half coc = (1.0 - FocusDist / linearEyeDepth) * MaxCoC;
+    half nearCoC = clamp(coc, -1.0, 0.0);
+    half farCoC = saturate(coc);
+
+    return saturate((farCoC + nearCoC + 1.0) * 0.5);
+}
+```
+
+---
+
+### 修正されたコード (Skybox除外処理)
+
+```hlsl
+half FragCoC(Varyings input) : SV_Target
+{
+    UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
+    float2 uv = UnityStereoTransformScreenSpaceTex(input.texcoord);
+    float depth = LOAD_TEXTURE2D_X(_CameraDepthTexture, _SourceSize.xy * uv).x; // Depth: 0.0 (near) ~ 1.0 (far)
+    float linearEyeDepth = LinearEyeDepth(depth, _ZBufferParams);
+
+    // Main CoC calculation
+    half coc = (1.0 - FocusDist / linearEyeDepth) * MaxCoC;
+
+    // --- Prevent DoF blur on skybox/clouds ---
+    const float SKYBOX_DEPTH_THRESHOLD_NEAR_ZERO = 0.0001f;
+    const float SKYBOX_DEPTH_THRESHOLD_FAR = 0.9999f;
+
+    if (depth <= SKYBOX_DEPTH_THRESHOLD_NEAR_ZERO || depth >= SKYBOX_DEPTH_THRESHOLD_FAR)
+    {
+        coc = 0.0h;
+    }
+    // --- End of exclusion logic ---
+
+    half nearCoC = clamp(coc, -1.0, 0.0);
+    half farCoC = saturate(coc);
+
+    return saturate((farCoC + nearCoC + 1.0) * 0.5);
+}
+```
+<br/>
+簡単に説明すると、
+
+**遠景にあたる1の部分については計算から除外**すれば、私がお金を出して買った素敵な空にボケがかからなくなるということです。
+<br/>
+---
+<br/>
+
+## 結果
+![Image 3](/_projects/1/1.gif)
+
+![Image 4](/_projects/1/2.png)
+**開発中の画面**
+
+詳しく見ると、建物や背景にはボケが適用されてぼやけて見えますが、
+
+**空の星は美しく輝いている**ことがわかります。
+
+
+
+
+
+<br/>
+---
+<br/>
+## 結論
+
+ポストプロセス効果は画面全体のピクセルに無差別に適用されるため、**深度に基づいた例外処理**が不可欠です。
+
+今回の修正のおかげで、購入した80ドルの素敵な空がもうぼやけることなく、美しく保たれます。
+
+---
+
+> _"好きな作家の小説の一節とともに締めくくりましょう。"_
+
+![Image 5](/_projects/1/3.jpg)
