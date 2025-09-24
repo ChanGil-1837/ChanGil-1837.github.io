@@ -62,12 +62,24 @@ async function getProjects(locale: string): Promise<Project[]> {
     const description = (isJP ? ctx.properties?.JPDesc?.rich_text : ctx.properties?.Description?.rich_text)
       ?.map((textBlock: any) => textBlock.text?.content || '')
       .join('\n') || 'No Description';
-    const cover = ctx.cover?.file?.url || '';
+    const slug = ctx.properties?.slug?.rich_text?.[0]?.text?.content || null;
+    let cover = ctx.cover?.file?.url || '';
+    if (slug) {
+      const imageDir = path.join(process.cwd(), 'public', '_projects', slug);
+      try {
+        const files = fs.readdirSync(imageDir);
+        const imageFile = files.find(file => !file.startsWith('.')); // Ignore files like .DS_Store
+        if (imageFile) {
+          cover = `/_projects/${slug}/${imageFile}`;
+        }
+      } catch (e) {
+        // console.log(`No local cover image for slug ${slug}, using Notion cover.`);
+      }
+    }
     const start = ctx.properties?.['Work period']?.date?.start || 'No Start Date';
     const end = ctx.properties?.['Work period']?.date?.end || 'No End Date';
     const link = ctx.properties?.link?.url || 'No Link';
     const tags = ctx.properties?.Tags?.multi_select?.map((tag: any) => ({ name: tag.name })) || [];
-    const slug = ctx.properties?.slug?.rich_text?.[0]?.text?.content || null;
     const relative = ctx.properties?.relative?.rich_text?.[0]?.text?.content?.split(',').map((s: string) => s.trim()) || [];
 
     let contentSource = description; // Default to description

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import ProjectItem from './project-item';
+import ProjectItemSkeleton from './ProjectItemSkeleton';
 import ProjectModal from './ProjectModal';
 import { useLocale } from '../contexts/LocaleContext';
 import { MDXRemoteSerializeResult } from 'next-mdx-remote';
@@ -120,9 +121,15 @@ export default function ProjectsClient() {
 
         {/* 프로젝트 리스트 */}
         <div className="masonry-container py-10 m-6 sm:w-full">
-          {filteredProjects.map((project) => (
-            <ProjectItem key={project.id} project={project} onProjectClick={handleProjectClick} />
-          ))}
+          {loading ? (
+            Array.from({ length: 6 }).map((_, index) => (
+              <ProjectItemSkeleton key={index} />
+            ))
+          ) : (
+            filteredProjects.map((project) => (
+              <ProjectItem key={project.id} project={project} onProjectClick={handleProjectClick} />
+            ))
+          )}
         </div>
       </div>
 
