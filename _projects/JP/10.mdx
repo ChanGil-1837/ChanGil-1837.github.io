@@ -1,0 +1,182 @@
+# 非線形データ構造とその探索手法
+
+コンピュータサイエンスにおいて、データを効率的に保存・管理することは非常に重要です。私たちはよく配列やリストのような**線形データ構造**を使用しますが、実際の世界の複雑な関係を表現するには**非線形データ構造**が不可欠です。本稿では、非線形データ構造の基本概念と、それを探索する二つの強力な手法、すなわち深さ優先探索（DFS）と幅優先探索（BFS）について解説します。
+<br/>
+---
+<br/>
+<br/>
+## 非線形データ構造の理解：ツリーとグラフ
+
+線形データ構造がデータを一列に並べる方式であるのに対し、非線形データ構造はデータ要素同士が複雑な接続関係を持つ形式です。
+
+### 1. ツリー (Tree)
+<br/>
+ツリーは階層的な構造を持つ非線形データ構造です。木のように根（Root）から枝（Branch）が伸び、葉（Leaf）で終わる形をしています。各ノードは親子関係を持ち、サイクルが存在しないのが特徴です。ファイルシステム、組織図、意思決定ツリーなど、さまざまな分野で利用されます。
+<br/>
+### 2. グラフ (Graph)
+<br/>
+グラフはノード（頂点, Vertex）とエッジ（辺, Edge）で構成される、最も一般的な非線形データ構造です。ノードはエッジを通じて互いに接続されることができます。ツリーはグラフの特殊な形と見なすことができます。ソーシャルネットワーク、地図経路探索、回路設計など、多くの問題解決に使用されます。
+<br/>
+---
+<br/>
+<br/>
+## 非線形データ構造の探索手法
+<br/>
+複雑に絡み合った非線形データ構造で目的のデータを探す、あるいは全てのデータを訪問するには、効率的な探索アルゴリズムが必要です。代表的な手法としてDFSとBFSがあります。
+<br/>
+### 1. 深さ優先探索 (DFS: Depth-First Search)
+<br/>
+DFSは名前の通り、グラフの深い部分を優先的に探索するアルゴリズムです。開始ノードから一方向に進める限り最も遠くまで探索し、行き止まりになったら戻って（バックトラック）別の経路を探索します。迷路探索、経路探索、トポロジカルソートなどに活用されます。
+
+```csharp
+using System; 
+using System.Collections.Generic; 
+
+public class Graph 
+{ 
+    private Dictionary<string, List<string>> adj; 
+
+    public Graph() 
+    { 
+        adj = new Dictionary<string, List<string>>(); 
+    } 
+
+    public void AddEdge(string u, string v) 
+    { 
+        if (!adj.ContainsKey(u)) adj[u] = new List<string>(); 
+        if (!adj.ContainsKey(v)) adj[v] = new List<string>(); // Ensure all nodes are in adj list 
+        adj[u].Add(v); 
+    } 
+
+    public List<string> DFS(string startNode) 
+    { 
+        HashSet<string> visited = new HashSet<string>(); 
+        Stack<string> stack = new Stack<string>(); 
+        List<string> result = new List<string>(); 
+
+        stack.Push(startNode); 
+
+        while (stack.Count > 0) 
+        { 
+            string node = stack.Pop(); 
+            if (!visited.Contains(node)) 
+            { 
+                visited.Add(node); 
+                result.Add(node); 
+
+                if (adj.ContainsKey(node)) 
+                { 
+                    List<string> neighbors = adj[node]; 
+                    for (int i = neighbors.Count - 1; i >= 0; i--) 
+                    { 
+                        if (!visited.Contains(neighbors[i])) 
+                        { 
+                            stack.Push(neighbors[i]); 
+                        } 
+                    } 
+                } 
+            } 
+        } 
+        return result; 
+    } 
+} 
+
+Graph graph = new Graph(); 
+graph.AddEdge("A", "B"); 
+graph.AddEdge("A", "C"); 
+graph.AddEdge("B", "D"); 
+graph.AddEdge("B", "E"); 
+graph.AddEdge("C", "F"); 
+graph.AddEdge("E", "F"); 
+
+Console.WriteLine("DFS 探索順序: " + string.Join(", ", graph.DFS("A")));
+```
+<br/> 
+### 2. 幅優先探索 (BFS: Breadth-First Search) 
+<br/> 
+BFSは開始ノードから近いノードを優先的に探索するアルゴリズムです。同じレベルのノードを先に探索し、その後次のレベルのノードを探索します。最短経路探索、ネットワークブロードキャスト、ソーシャルネットワークでの友達探索などに利用されます。
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+public class Graph
+{
+    private Dictionary<string, List<string>> adj;
+
+    public Graph()
+    {
+        adj = new Dictionary<string, List<string>>();
+    }
+
+    public void AddEdge(string u, string v)
+    {
+        if (!adj.ContainsKey(u)) adj[u] = new List<string>();
+        if (!adj.ContainsKey(v)) adj[v] = new List<string>();
+        adj[u].Add(v);
+    }
+
+    public List<string> BFS(string startNode)
+    {
+        HashSet<string> visited = new HashSet<string>();
+        Queue<string> queue = new Queue<string>();
+        List<string> result = new List<string>();
+
+        visited.Add(startNode);
+        queue.Enqueue(startNode);
+
+        while (queue.Count > 0)
+        {
+            string node = queue.Dequeue();
+            result.Add(node);
+
+            if (adj.ContainsKey(node))
+            { 
+                foreach (string neighbor in adj[node])
+                {
+                    if (!visited.Contains(neighbor))
+                    {
+                        visited.Add(neighbor);
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+}
+
+Graph graph = new Graph();
+graph.AddEdge("A", "B");
+graph.AddEdge("A", "C");
+graph.AddEdge("B", "D");
+graph.AddEdge("B", "E");
+graph.AddEdge("C", "F");
+graph.AddEdge("E", "F");
+
+Console.WriteLine("BFS 探索順序: " + string.Join(", ", graph.BFS("A")));
+
+```
+
+<br/> 
+--- 
+<br/> 
+## DFS/BFS 可視化ツールで直接体験 
+<br/> 
+理論だけではDFSとBFSの動作を完全に理解するのは難しい場合があります。下記の可視化ツールを使い、ノードを追加・接続し、各アルゴリズムがどのようにノードを訪問するかを視覚的に確認してみましょう。 
+<br/> 
+<DFSBFSVisualizer /> 
+<br/> 
+### 使用方法 
+<br/> 
+* **ノード作成:** SVG領域をダブルクリックするとノードを追加できます。 
+* **ノード移動:** ノードをドラッグして位置を調整できます。 
+* **線の接続:** ノードを選択後、Shiftキーを押しながら別のノードをクリックすると線が接続されます。 
+* **探索開始:** 開始ノードを選択し、DFSまたはBFSを選んだ後、「Run」ボタンを押します。 
+* **速度調整:** スライダーでアニメーション速度を変更できます。 
+<br/> 
+--- 
+<br/> 
+## 結論 
+<br/> 
+非線形データ構造は、現代のコンピューティング環境で複雑なデータをモデル化・処理するために不可欠なツールです。DFSとBFSはこのデータ構造を探索する基本アルゴリズムであり、その原理を理解することはさまざまな問題解決能力の向上に役立ちます。可視化ツールを使って実際に体験し、その違いを明確に理解してください。

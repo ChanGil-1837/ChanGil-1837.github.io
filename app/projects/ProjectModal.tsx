@@ -6,6 +6,9 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Resizable } from "re-resizable";
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
+
+const DFSBFSVisualizer = dynamic(() => import('../components/DfsbfsVisualizer'), { ssr: false });
 
 type Project = {
   id: string;
@@ -227,7 +230,7 @@ export default function ProjectModal({ project, onClose, onOpenProjectBySlug, al
 
                 {/* Content */}
                 <article className="prose dark:prose-invert lg:prose-xl max-w-none pt-4 break-words">
-                  <MDXRemote {...project.content} components={{ ...components, OpenProjectLink }} />
+                  <MDXRemote {...project.content} components={{ ...components, OpenProjectLink, DFSBFSVisualizer }} />
                 </article>
               </div>
             </div>
