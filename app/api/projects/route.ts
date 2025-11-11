@@ -46,7 +46,7 @@ async function getProjects(locale: string): Promise<Project[]> {
         },
       ],
     }),
-    next: { revalidate: 600 },
+    next: { revalidate: 0 },
   });
 
   if (!res.ok) throw new Error('Failed to fetch projects from Notion');
